@@ -5,9 +5,9 @@ import { vitePreprocess } from '@sveltejs/vite-plugin-svelte';
 const config = {
   preprocess: vitePreprocess(),
   kit: {
-    // Pin the serverless runtime so the build doesn't try to default to the
-    // (unsupported) Node version of the build machine.
-    adapter: adapter({ runtime: 'nodejs20.x' }),
+    // Pin the serverless runtime to Node 22, which has native WebSocket
+    // support required by @supabase/realtime-js (Node 20 lacks it).
+    adapter: adapter({ runtime: 'nodejs22.x' }),
     env: {
       // The Supabase integration exposes browser vars with this prefix
       publicPrefix: 'NEXT_PUBLIC_'
