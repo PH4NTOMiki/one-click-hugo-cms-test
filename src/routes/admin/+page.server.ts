@@ -4,7 +4,7 @@ import type { Actions, PageServerLoad } from './$types';
 export const load: PageServerLoad = async ({ locals }) => {
 	const { data: nominees } = await locals.supabase
 		.from('nominees')
-		.select('id, name, workplace, city, approved, is_winner, created_at')
+		.select('id, name, first_name, last_name, workplace, city, approved, is_winner, created_at')
 		.order('created_at', { ascending: false });
 
 	const { data: votes } = await locals.supabase.from('votes').select('nominee_id');
@@ -32,12 +32,16 @@ export const actions: Actions = {
 	updateNominee: async ({ request, locals }) => {
 		const f = await request.formData();
 		const id = String(f.get('id'));
-		const name = String(f.get('name') ?? '').trim();
+		const firstName = String(f.get('first_name') ?? '').trim();
+		const lastName = String(f.get('last_name') ?? '').trim();
+		const name = [firstName, lastName].filter(Boolean).join(' ').trim();
 		if (name.length < 2) return fail(400, { error: 'Ime je obavezno.' });
 		const { error } = await locals.supabase
 			.from('nominees')
 			.update({
 				name,
+				first_name: firstName || null,
+				last_name: lastName || null,
 				workplace: String(f.get('workplace') ?? '').trim() || null,
 				city: String(f.get('city') ?? '').trim() || null,
 				approved: f.get('approved') === 'on'
@@ -81,10 +85,15 @@ export const actions: Actions = {
 		const f = await request.formData();
 		const id = String(f.get('id'));
 		const status = String(f.get('status') ?? 'pending');
+		const firstName = String(f.get('first_name') ?? '').trim();
+		const lastName = String(f.get('last_name') ?? '').trim();
+		const nurseName = [firstName, lastName].filter(Boolean).join(' ').trim();
 		const { error } = await locals.supabase
 			.from('stories')
 			.update({
-				nurse_name: String(f.get('nurse_name') ?? '').trim(),
+				nurse_name: nurseName,
+				first_name: firstName || null,
+				last_name: lastName || null,
 				workplace: String(f.get('workplace') ?? '').trim() || null,
 				city: String(f.get('city') ?? '').trim() || null,
 				message: String(f.get('message') ?? '').trim(),

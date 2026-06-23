@@ -41,11 +41,19 @@
 				</div>
 			{:else}
 				<form method="POST" action="?/submit" use:enhance class="grid gap-4">
-					<div class="grid gap-1.5">
-						<label for="nurse_name" class="text-sm font-medium">Ime i prezime medicinske sestre *</label>
-						<input id="nurse_name" name="nurse_name" required value={form?.values?.nurseName ?? ''}
-							class="rounded-xl border border-input bg-background px-4 py-2.5 outline-none transition-colors focus:border-accent"
-							placeholder="Unesite ime i prezime" />
+					<div class="grid gap-4 sm:grid-cols-2">
+						<div class="grid gap-1.5">
+							<label for="first_name" class="text-sm font-medium">Ime sestre *</label>
+							<input id="first_name" name="first_name" required value={form?.values?.firstName ?? ''}
+								class="rounded-xl border border-input bg-background px-4 py-2.5 outline-none transition-colors focus:border-accent"
+								placeholder="Unesite ime" />
+						</div>
+						<div class="grid gap-1.5">
+							<label for="last_name" class="text-sm font-medium">Prezime sestre *</label>
+							<input id="last_name" name="last_name" required value={form?.values?.lastName ?? ''}
+								class="rounded-xl border border-input bg-background px-4 py-2.5 outline-none transition-colors focus:border-accent"
+								placeholder="Unesite prezime" />
+						</div>
 					</div>
 
 					<div class="grid gap-1.5">

@@ -8,11 +8,45 @@
 	let editingNominee = $state<string | null>(null);
 	let editingStory = $state<string | null>(null);
 
+	// Search / sort / filter state
+	let search = $state('');
+	let nomineeSort = $state<'votes' | 'name' | 'newest'>('votes');
+	let storySort = $state<'newest' | 'name' | 'status'>('newest');
+	let statusFilter = $state<'all' | 'pending' | 'approved' | 'rejected'>('all');
+
 	const statusLabel: Record<string, string> = {
 		pending: 'Na čekanju',
 		approved: 'Odobreno',
 		rejected: 'Odbijeno'
 	};
+
+	function matches(...fields: (string | null | undefined)[]) {
+		const q = search.trim().toLowerCase();
+		if (!q) return true;
+		return fields.some((f) => (f ?? '').toLowerCase().includes(q));
+	}
+
+	const filteredNominees = $derived(
+		[...data.nominees]
+			.filter((n) => matches(n.name, n.workplace, n.city))
+			.sort((a, b) => {
+				if (nomineeSort === 'name') return a.name.localeCompare(b.name, 'hr');
+				if (nomineeSort === 'newest')
+					return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+				return (b.vote_count ?? 0) - (a.vote_count ?? 0);
+			})
+	);
+
+	const filteredStories = $derived(
+		[...data.stories]
+			.filter((s) => statusFilter === 'all' || s.status === statusFilter)
+			.filter((s) => matches(s.nurse_name, s.workplace, s.city, s.message))
+			.sort((a, b) => {
+				if (storySort === 'name') return a.nurse_name.localeCompare(b.nurse_name, 'hr');
+				if (storySort === 'status') return a.status.localeCompare(b.status);
+				return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+			})
+	);
 </script>
 
 <svelte:head>
@@ -56,16 +90,70 @@
 			<p class="mt-4 rounded-lg bg-destructive/10 px-4 py-3 text-sm text-destructive">{form.error}</p>
 		{/if}
 
+		<!-- Toolbar: search, sort, filter, export -->
+		<div class="mt-6 flex flex-wrap items-center gap-3">
+			<div class="relative flex-1 min-w-[200px]">
+				<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+				<input
+					bind:value={search}
+					placeholder="Pretraži po imenu, ustanovi ili gradu…"
+					class="w-full rounded-xl border border-input bg-card py-2.5 pl-9 pr-3 text-sm outline-none transition-colors focus:border-primary"
+				/>
+			</div>
+
+			{#if tab === 'votes'}
+				<label class="flex items-center gap-2 text-sm text-muted-foreground">
+					Sortiraj
+					<select bind:value={nomineeSort} class="rounded-lg border border-input bg-card px-3 py-2 text-sm text-foreground">
+						<option value="votes">Najviše glasova</option>
+						<option value="name">Ime (A–Ž)</option>
+						<option value="newest">Najnovije</option>
+					</select>
+				</label>
+				<a href="/admin/export?type=nominees" download
+					class="inline-flex items-center gap-2 rounded-lg border border-border bg-card px-3 py-2 text-sm font-medium hover:bg-muted">
+					<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
+					Izvezi CSV
+				</a>
+			{:else}
+				<label class="flex items-center gap-2 text-sm text-muted-foreground">
+					Status
+					<select bind:value={statusFilter} class="rounded-lg border border-input bg-card px-3 py-2 text-sm text-foreground">
+						<option value="all">Sve</option>
+						<option value="pending">Na čekanju</option>
+						<option value="approved">Odobreno</option>
+						<option value="rejected">Odbijeno</option>
+					</select>
+				</label>
+				<label class="flex items-center gap-2 text-sm text-muted-foreground">
+					Sortiraj
+					<select bind:value={storySort} class="rounded-lg border border-input bg-card px-3 py-2 text-sm text-foreground">
+						<option value="newest">Najnovije</option>
+						<option value="name">Ime (A–Ž)</option>
+						<option value="status">Status</option>
+					</select>
+				</label>
+				<a href="/admin/export?type=stories" download
+					class="inline-flex items-center gap-2 rounded-lg border border-border bg-card px-3 py-2 text-sm font-medium hover:bg-muted">
+					<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
+					Izvezi CSV
+				</a>
+			{/if}
+		</div>
+
 		<!-- VOTES TAB -->
 		{#if tab === 'votes'}
-			<div class="mt-6 grid gap-3">
-				{#each data.nominees as n, i (n.id)}
+			<div class="mt-4 grid gap-3">
+				{#each filteredNominees as n, i (n.id)}
 					<div class="rounded-xl border border-border bg-card p-4">
 						{#if editingNominee === n.id}
 							<form method="POST" action="?/updateNominee" use:enhance={() => async ({ update }) => { await update(); editingNominee = null; }} class="grid gap-3">
 								<input type="hidden" name="id" value={n.id} />
-								<div class="grid gap-3 sm:grid-cols-3">
-									<input name="name" value={n.name} placeholder="Ime" class="rounded-lg border border-input bg-background px-3 py-2" />
+								<div class="grid gap-3 sm:grid-cols-2">
+									<input name="first_name" value={n.first_name ?? ''} placeholder="Ime" class="rounded-lg border border-input bg-background px-3 py-2" />
+									<input name="last_name" value={n.last_name ?? ''} placeholder="Prezime" class="rounded-lg border border-input bg-background px-3 py-2" />
+								</div>
+								<div class="grid gap-3 sm:grid-cols-2">
 									<input name="workplace" value={n.workplace ?? ''} placeholder="Ustanova" class="rounded-lg border border-input bg-background px-3 py-2" />
 									<input name="city" value={n.city ?? ''} placeholder="Grad" class="rounded-lg border border-input bg-background px-3 py-2" />
 								</div>
@@ -115,21 +203,24 @@
 						{/if}
 					</div>
 				{:else}
-					<p class="rounded-xl border border-dashed border-border bg-card p-8 text-center text-muted-foreground">Nema prijedloga.</p>
+					<p class="rounded-xl border border-dashed border-border bg-card p-8 text-center text-muted-foreground">Nema rezultata.</p>
 				{/each}
 			</div>
 		{/if}
 
 		<!-- STORIES TAB -->
 		{#if tab === 'stories'}
-			<div class="mt-6 grid gap-3">
-				{#each data.stories as s (s.id)}
+			<div class="mt-4 grid gap-3">
+				{#each filteredStories as s (s.id)}
 					<div class="rounded-xl border border-border bg-card p-4 {s.is_winner ? 'border-accent ring-1 ring-accent' : ''}">
 						{#if editingStory === s.id}
 							<form method="POST" action="?/updateStory" use:enhance={() => async ({ update }) => { await update(); editingStory = null; }} class="grid gap-3">
 								<input type="hidden" name="id" value={s.id} />
-								<div class="grid gap-3 sm:grid-cols-3">
-									<input name="nurse_name" value={s.nurse_name} placeholder="Ime sestre" class="rounded-lg border border-input bg-background px-3 py-2" />
+								<div class="grid gap-3 sm:grid-cols-2">
+									<input name="first_name" value={s.first_name ?? ''} placeholder="Ime sestre" class="rounded-lg border border-input bg-background px-3 py-2" />
+									<input name="last_name" value={s.last_name ?? ''} placeholder="Prezime sestre" class="rounded-lg border border-input bg-background px-3 py-2" />
+								</div>
+								<div class="grid gap-3 sm:grid-cols-2">
 									<input name="workplace" value={s.workplace ?? ''} placeholder="Ustanova" class="rounded-lg border border-input bg-background px-3 py-2" />
 									<input name="city" value={s.city ?? ''} placeholder="Grad" class="rounded-lg border border-input bg-background px-3 py-2" />
 								</div>
@@ -180,7 +271,7 @@
 						{/if}
 					</div>
 				{:else}
-					<p class="rounded-xl border border-dashed border-border bg-card p-8 text-center text-muted-foreground">Nema poslanih priča.</p>
+					<p class="rounded-xl border border-dashed border-border bg-card p-8 text-center text-muted-foreground">Nema rezultata.</p>
 				{/each}
 			</div>
 		{/if}

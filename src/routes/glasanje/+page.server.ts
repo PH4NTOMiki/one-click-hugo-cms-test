@@ -24,16 +24,21 @@ export const load: PageServerLoad = async ({ cookies }) => {
 export const actions: Actions = {
 	vote: async ({ request, cookies }) => {
 		const form = await request.formData();
-		const name = String(form.get('name') ?? '').trim();
+		const firstName = String(form.get('first_name') ?? '').trim();
+		const lastName = String(form.get('last_name') ?? '').trim();
+		const name = [firstName, lastName].filter(Boolean).join(' ').trim();
 		const workplace = String(form.get('workplace') ?? '').trim();
 		const city = String(form.get('city') ?? '').trim();
 		const confirmPatient = form.get('confirm_patient') === 'on';
 		const acceptRules = form.get('accept_rules') === 'on';
 
-		const values = { name, workplace, city };
+		const values = { firstName, lastName, workplace, city };
 
-		if (name.length < 2) {
-			return fail(400, { error: 'Unesite ime i prezime medicinske sestre.', values });
+		if (firstName.length < 2) {
+			return fail(400, { error: 'Unesite ime medicinske sestre.', values });
+		}
+		if (lastName.length < 2) {
+			return fail(400, { error: 'Unesite prezime medicinske sestre.', values });
 		}
 		if (workplace.length < 2) {
 			return fail(400, { error: 'Unesite ustanovu u kojoj sestra radi.', values });
@@ -76,7 +81,13 @@ export const actions: Actions = {
 		if (!nomineeId) {
 			const { data: created, error: insertError } = await supabaseAdmin
 				.from('nominees')
-				.insert({ name, workplace: workplace || null, city: city || null })
+				.insert({
+					name,
+					first_name: firstName,
+					last_name: lastName,
+					workplace: workplace || null,
+					city: city || null
+				})
 				.select('id')
 				.single();
 			if (insertError || !created) {

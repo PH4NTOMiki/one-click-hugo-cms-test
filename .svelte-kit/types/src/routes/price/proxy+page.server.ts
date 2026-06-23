@@ -5,17 +5,22 @@ import type { Actions } from './$types';
 export const actions = {
 	submit: async ({ request, locals }: import('./$types').RequestEvent) => {
 		const form = await request.formData();
-		const nurseName = String(form.get('nurse_name') ?? '').trim();
+		const firstName = String(form.get('first_name') ?? '').trim();
+		const lastName = String(form.get('last_name') ?? '').trim();
+		const nurseName = [firstName, lastName].filter(Boolean).join(' ').trim();
 		const workplace = String(form.get('workplace') ?? '').trim();
 		const city = String(form.get('city') ?? '').trim();
 		const message = String(form.get('message') ?? '').trim();
 		const confirmPatient = form.get('confirm_patient') === 'on';
 		const acceptRules = form.get('accept_rules') === 'on';
 
-		const values = { nurseName, workplace, city, message };
+		const values = { firstName, lastName, workplace, city, message };
 
-		if (nurseName.length < 2) {
-			return fail(400, { error: 'Unesite ime i prezime medicinske sestre.', values });
+		if (firstName.length < 2) {
+			return fail(400, { error: 'Unesite ime medicinske sestre.', values });
+		}
+		if (lastName.length < 2) {
+			return fail(400, { error: 'Unesite prezime medicinske sestre.', values });
 		}
 		if (workplace.length < 2) {
 			return fail(400, { error: 'Unesite ustanovu u kojoj sestra radi.', values });
@@ -32,6 +37,8 @@ export const actions = {
 
 		const { error } = await locals.supabase.from('stories').insert({
 			nurse_name: nurseName,
+			first_name: firstName,
+			last_name: lastName,
 			workplace: workplace || null,
 			city: city || null,
 			message

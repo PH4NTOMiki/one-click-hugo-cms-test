@@ -11,6 +11,9 @@
 		"src/routes/admin/+layout.server.ts",
 		"src/routes/+layout.server.ts"
 	],
+	"/admin/export": [
+		"src/routes/admin/export/+server.ts"
+	],
 	"/admin/login": [
 		"src/routes/admin/login/+page.server.ts",
 		"src/routes/admin/+layout.server.ts",
