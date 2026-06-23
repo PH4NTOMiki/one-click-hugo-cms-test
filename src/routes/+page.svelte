@@ -25,21 +25,6 @@
 			<p class="mt-5 max-w-md text-lg leading-relaxed text-muted-foreground text-pretty">
 				Pomozite nam pronaći sestre koje pacijentima znače najviše.
 			</p>
-			<div class="mt-7 flex flex-wrap gap-3">
-				<a
-					href="/glasanje"
-					class="inline-flex items-center gap-2 rounded-xl bg-primary px-5 py-3 font-semibold text-primary-foreground transition-opacity hover:opacity-90"
-				>
-					Glasaj za sestru
-					<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
-				</a>
-				<a
-					href="/price"
-					class="inline-flex items-center gap-2 rounded-xl bg-accent px-5 py-3 font-semibold text-accent-foreground transition-opacity hover:opacity-90"
-				>
-					Napiši priču
-				</a>
-			</div>
 		</div>
 		<div class="overflow-hidden rounded-3xl">
 			<img

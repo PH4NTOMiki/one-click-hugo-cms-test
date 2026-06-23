@@ -41,16 +41,16 @@
 			{:else}
 				<form method="POST" action="?/vote" use:enhance class="grid gap-4">
 					<div class="grid gap-4 sm:grid-cols-2">
-						<div class="grid gap-1.5">
+						<div class="grid min-w-0 gap-1.5">
 							<label for="first_name" class="text-sm font-medium">Ime sestre *</label>
 							<input id="first_name" name="first_name" required value={form?.values?.firstName ?? ''}
-								class="rounded-xl border border-input bg-background px-4 py-2.5 outline-none transition-colors focus:border-primary"
+								class="w-full rounded-xl border border-input bg-background px-4 py-2.5 outline-none transition-colors focus:border-primary"
 								placeholder="Unesite ime" />
 						</div>
-						<div class="grid gap-1.5">
+						<div class="grid min-w-0 gap-1.5">
 							<label for="last_name" class="text-sm font-medium">Prezime sestre *</label>
 							<input id="last_name" name="last_name" required value={form?.values?.lastName ?? ''}
-								class="rounded-xl border border-input bg-background px-4 py-2.5 outline-none transition-colors focus:border-primary"
+								class="w-full rounded-xl border border-input bg-background px-4 py-2.5 outline-none transition-colors focus:border-primary"
 								placeholder="Unesite prezime" />
 						</div>
 					</div>
