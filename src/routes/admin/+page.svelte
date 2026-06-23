@@ -84,6 +84,7 @@
 									<div>
 										<div class="flex items-center gap-2">
 											<h3 class="font-semibold">{n.name}</h3>
+											{#if n.is_winner}<span class="rounded-full bg-primary/15 px-2 py-0.5 text-xs font-semibold text-primary">Pobjednik</span>{/if}
 											{#if !n.approved}<span class="rounded-full bg-destructive/10 px-2 py-0.5 text-xs text-destructive">Skriveno</span>{/if}
 										</div>
 										<p class="text-sm text-muted-foreground">{[n.workplace, n.city].filter(Boolean).join(' · ') || '—'}</p>
@@ -97,6 +98,19 @@
 										<button class="rounded-lg border border-border px-3 py-1.5 text-sm text-destructive hover:bg-destructive/10">Obriši</button>
 									</form>
 								</div>
+							</div>
+							<div class="mt-3 flex flex-wrap gap-2 border-t border-border pt-3">
+								{#if n.is_winner}
+									<form method="POST" action="?/clearVoteWinner" use:enhance>
+										<input type="hidden" name="id" value={n.id} />
+										<button class="rounded-lg border border-border px-3 py-1.5 text-sm hover:bg-muted">Ukloni pobjednika</button>
+									</form>
+								{:else}
+									<form method="POST" action="?/setVoteWinner" use:enhance>
+										<input type="hidden" name="id" value={n.id} />
+										<button class="rounded-lg bg-primary px-3 py-1.5 text-sm font-medium text-primary-foreground hover:opacity-90">Proglasi pobjednikom</button>
+									</form>
+								{/if}
 							</div>
 						{/if}
 					</div>

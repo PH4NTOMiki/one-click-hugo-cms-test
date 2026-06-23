@@ -4,7 +4,7 @@ import type { Actions, PageServerLoad } from './$types';
 export const load: PageServerLoad = async ({ locals }) => {
 	const { data: nominees } = await locals.supabase
 		.from('nominees')
-		.select('id, name, workplace, city, approved, created_at')
+		.select('id, name, workplace, city, approved, is_winner, created_at')
 		.order('created_at', { ascending: false });
 
 	const { data: votes } = await locals.supabase.from('votes').select('nominee_id');
@@ -51,6 +51,29 @@ export const actions: Actions = {
 		const f = await request.formData();
 		const { error } = await locals.supabase.from('nominees').delete().eq('id', String(f.get('id')));
 		if (error) return fail(500, { error: 'Brisanje nije uspjelo.' });
+		return { success: true };
+	},
+
+	setVoteWinner: async ({ request, locals }) => {
+		const f = await request.formData();
+		const id = String(f.get('id'));
+		// Only one voting winner at a time; the winner is shown publicly so approve it too.
+		await locals.supabase.from('nominees').update({ is_winner: false }).eq('is_winner', true);
+		const { error } = await locals.supabase
+			.from('nominees')
+			.update({ is_winner: true, approved: true })
+			.eq('id', id);
+		if (error) return fail(500, { error: 'Postavljanje pobjednika nije uspjelo.' });
+		return { success: true };
+	},
+
+	clearVoteWinner: async ({ request, locals }) => {
+		const f = await request.formData();
+		const { error } = await locals.supabase
+			.from('nominees')
+			.update({ is_winner: false })
+			.eq('id', String(f.get('id')));
+		if (error) return fail(500, { error: 'Greška.' });
 		return { success: true };
 	},
 

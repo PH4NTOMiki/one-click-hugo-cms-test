@@ -4,6 +4,7 @@ export interface Nominee {
 	workplace: string | null;
 	city: string | null;
 	approved: boolean;
+	is_winner: boolean;
 	created_at: string;
 	vote_count?: number;
 }
