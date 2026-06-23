@@ -21,22 +21,24 @@
 	>
 		<div class="order-2 md:order-1">
 			<h1
-				class="text-xl font-extrabold leading-tight text-balance text-foreground sm:text-4xl md:text-5xl"
+				class="text-3xl font-extrabold leading-tight text-balance text-foreground sm:text-4xl md:text-5xl"
 			>
-				Naj medicinska sestra za dijabetes
+				Zahvalimo sestrama koje čine razliku.
 				<span class="text-accent">♥</span>
 			</h1>
 			<p
-				class="mt-2 hidden max-w-md leading-relaxed text-muted-foreground text-pretty sm:block md:mt-5 md:text-lg"
+				class="mt-3 max-w-md leading-relaxed text-muted-foreground text-pretty md:mt-5 md:text-lg"
 			>
-				Pomozite nam pronaći sestre koje pacijentima znače najviše.
+				Predložite medicinsku sestru koja vam je svojim znanjem i ljudskošću
+				ostavila trag; a mi ćemo dvije odvesti u Pariz na konferenciju o
+				dijabetesu!
 			</p>
 		</div>
 		<div class="order-1 overflow-hidden rounded-2xl md:order-2 md:rounded-3xl">
 			<img
 				src="/nurse-hero.png"
-				alt="Medicinska sestra drži ruke starije pacijentice"
-				class="h-24 w-full object-cover object-top sm:h-44 md:h-56 lg:h-64"
+				alt="Nasmiješena medicinska sestra u plavoj uniformi prekriženih ruku"
+				class="h-44 w-full object-cover object-top sm:h-56 md:h-72 lg:h-80"
 				width="640"
 				height="520"
 			/>
