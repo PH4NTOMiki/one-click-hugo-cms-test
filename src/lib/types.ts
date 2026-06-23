@@ -1,9 +1,12 @@
 export interface Nominee {
 	id: string;
 	name: string;
+	first_name: string | null;
+	last_name: string | null;
 	workplace: string | null;
 	city: string | null;
 	approved: boolean;
+	is_winner: boolean;
 	created_at: string;
 	vote_count?: number;
 }
@@ -11,6 +14,8 @@ export interface Nominee {
 export interface Story {
 	id: string;
 	nurse_name: string;
+	first_name: string | null;
+	last_name: string | null;
 	workplace: string | null;
 	city: string | null;
 	author_name: string | null;

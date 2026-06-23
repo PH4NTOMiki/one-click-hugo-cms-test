@@ -1,57 +1,132 @@
+<script lang="ts">
+	import type { PageData } from './$types';
+
+	let { data }: { data: PageData } = $props();
+
+	const hasWinners = $derived(!!data.voteWinner || !!data.storyWinner);
+</script>
+
 <svelte:head>
-	<title>NajSestra — izbor najbolje dijabetičke sestre u Hrvatskoj</title>
+	<title>najMedicinska SESTRA — izbor najbolje sestre za dijabetes</title>
 	<meta
 		name="description"
-		content="Glasajte za najbolju dijabetičku medicinsku sestru u Hrvatskoj i podijelite priču o sestri koja vam je promijenila život."
+		content="Pomozite nam pronaći medicinske sestre koje pacijentima s dijabetesom znače najviše. Glasajte i podijelite svoju priču."
 	/>
 </svelte:head>
 
-<section class="mx-auto max-w-5xl px-4 py-16 text-center">
-	<span class="inline-block rounded-full bg-muted px-4 py-1 text-sm font-medium text-muted-foreground">
-		Nacionalni izbor 2026.
-	</span>
-	<h1 class="mx-auto mt-6 max-w-3xl text-4xl font-semibold leading-tight text-balance sm:text-5xl">
-		Tko je najbolja dijabetička sestra u Hrvatskoj?
-	</h1>
-	<p class="mx-auto mt-5 max-w-2xl text-lg leading-relaxed text-muted-foreground text-pretty">
-		Medicinske sestre koje brinu o osobama s dijabetesom svakodnevno čine male, ali nezaboravne
-		geste. Pomozite nam da odamo priznanje najboljima — predložite, glasajte i podijelite svoju
-		priču.
-	</p>
+<!-- Hero -->
+<section class="bg-card">
+	<div class="mx-auto grid max-w-5xl items-center gap-4 px-4 py-4 md:grid-cols-2 md:gap-8 md:py-8">
+		<div class="order-2 md:order-1">
+			<h1 class="text-xl font-extrabold leading-tight text-balance text-foreground sm:text-4xl md:text-5xl">
+				Naj medicinska sestra za dijabetes
+				<span class="text-accent">♥</span>
+			</h1>
+			<p class="mt-2 hidden max-w-md leading-relaxed text-muted-foreground text-pretty sm:block md:mt-5 md:text-lg">
+				Pomozite nam pronaći sestre koje pacijentima znače najviše.
+			</p>
+		</div>
+		<div class="order-1 overflow-hidden rounded-2xl md:order-2 md:rounded-3xl">
+			<img
+				src="/nurse-hero.png"
+				alt="Medicinska sestra drži ruke starije pacijentice"
+				class="h-24 w-full object-cover object-top sm:h-44 md:h-56 lg:h-64"
+				width="640"
+				height="520"
+			/>
+		</div>
+	</div>
 </section>
 
-<section class="mx-auto grid max-w-5xl gap-6 px-4 pb-16 md:grid-cols-2">
-	<article class="flex flex-col rounded-2xl border border-border bg-card p-8">
-		<span class="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 text-primary">
-			<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 11 3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+<!-- Two action cards -->
+<section class="mx-auto grid max-w-5xl gap-4 px-4 py-6 md:grid-cols-2 md:gap-6 md:pb-12 md:pt-2">
+	<article class="flex flex-col rounded-2xl bg-blue-soft p-5 md:p-8">
+		<span class="flex h-11 w-11 items-center justify-center rounded-xl bg-primary text-primary-foreground md:h-14 md:w-14 md:rounded-2xl">
+			<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg>
 		</span>
-		<h2 class="mt-5 text-2xl font-semibold">Kategorija 1 — Glasanje</h2>
-		<p class="mt-3 flex-1 leading-relaxed text-muted-foreground">
-			Predložite ime sestre i glasajte za nju. Pobjednica je jednostavno ona s najviše glasova.
-			Svatko ima jedan glas.
+		<h2 class="mt-3 flex items-center gap-2 text-xl font-bold text-primary md:mt-5 md:text-2xl">
+			Priznanje pacijenata
+			<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-accent"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.29 1.51 4.04 3 5.5l7 7Z"/></svg>
+		</h2>
+		<p class="mt-2 flex-1 text-sm leading-relaxed text-muted-foreground text-pretty md:mt-3 md:text-base">
+			Nominirajte medicinsku sestru koja je svojim radom i podrškom ostavila poseban trag u vašem životu.
 		</p>
 		<a
 			href="/glasanje"
-			class="mt-6 inline-flex items-center justify-center rounded-xl bg-primary px-5 py-3 font-medium text-primary-foreground transition-opacity hover:opacity-90"
+			class="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-primary px-5 py-3 font-semibold text-primary-foreground transition-opacity hover:opacity-90 md:mt-6 md:py-3.5"
 		>
-			Glasaj sada
+			Predloži sestru
+			<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
 		</a>
 	</article>
 
-	<article class="flex flex-col rounded-2xl border border-border bg-card p-8">
-		<span class="flex h-12 w-12 items-center justify-center rounded-xl bg-accent/20 text-accent-foreground">
-			<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/></svg>
+	<article class="flex flex-col rounded-2xl bg-red-soft p-5 md:p-8">
+		<span class="flex h-11 w-11 items-center justify-center rounded-xl bg-accent text-accent-foreground md:h-14 md:w-14 md:rounded-2xl">
+			<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.29 1.51 4.04 3 5.5l7 7Z"/></svg>
 		</span>
-		<h2 class="mt-5 text-2xl font-semibold">Kategorija 2 — Priče</h2>
-		<p class="mt-3 flex-1 leading-relaxed text-muted-foreground">
-			Predložite sestru i napišite motivacijsku priču o tome zašto je baš ona najbolja. Naše
-			uredništvo odabire priču koja nas najviše dirne.
+		<h2 class="mt-3 flex items-center gap-2 text-xl font-bold text-accent md:mt-5 md:text-2xl">
+			Priča koja inspirira
+			<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-accent"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.29 1.51 4.04 3 5.5l7 7Z"/></svg>
+		</h2>
+		<p class="mt-2 flex-1 text-sm leading-relaxed text-muted-foreground text-pretty md:mt-3 md:text-base">
+			Podijelite svoju osobnu priču o medicinskoj sestri koja je pokazala iznimnu predanost, stručnost i ljudskost.
 		</p>
 		<a
 			href="/price"
-			class="mt-6 inline-flex items-center justify-center rounded-xl border border-primary px-5 py-3 font-medium text-primary transition-colors hover:bg-primary hover:text-primary-foreground"
+			class="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-accent px-5 py-3 font-semibold text-accent-foreground transition-opacity hover:opacity-90 md:mt-6 md:py-3.5"
 		>
-			Podijeli priču
+			Napiši svoju priču
+			<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
 		</a>
 	</article>
+</section>
+
+<!-- Winners announcement -->
+{#if hasWinners}
+	<section class="mx-auto max-w-5xl px-4 pb-12">
+		<div class="text-center">
+			<span class="inline-flex items-center gap-2 rounded-full bg-accent/10 px-4 py-1 text-sm font-semibold text-accent">
+				<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg>
+				Pobjednice
+			</span>
+			<h2 class="mt-3 text-3xl font-extrabold">Čestitamo našim pobjednicama</h2>
+			<p class="mx-auto mt-2 max-w-xl leading-relaxed text-muted-foreground">
+				Hvala svima koji su glasali i podijelili svoje priče. Ovo su sestre koje su ostavile najveći trag.
+			</p>
+		</div>
+
+		<div class="mt-8 grid gap-6 md:grid-cols-2">
+			{#if data.voteWinner}
+				<div class="rounded-2xl border-2 border-primary bg-card p-7">
+					<span class="text-xs font-semibold uppercase tracking-wider text-primary">Nagrada pacijenata</span>
+					<h3 class="mt-2 text-2xl font-bold">{data.voteWinner.name}</h3>
+					<p class="mt-1 text-sm text-muted-foreground">
+						{[data.voteWinner.workplace, data.voteWinner.city].filter(Boolean).join(' · ') || 'Medicinska sestra'}
+					</p>
+					<p class="mt-4 leading-relaxed text-pretty">
+						Sestra s najviše glasova pacijenata i njihovih obitelji.
+					</p>
+				</div>
+			{/if}
+
+			{#if data.storyWinner}
+				<div class="rounded-2xl border-2 border-accent bg-card p-7">
+					<span class="text-xs font-semibold uppercase tracking-wider text-accent">Priča koja inspirira</span>
+					<h3 class="mt-2 text-2xl font-bold">{data.storyWinner.nurse_name}</h3>
+					<p class="mt-1 text-sm text-muted-foreground">
+						{[data.storyWinner.workplace, data.storyWinner.city].filter(Boolean).join(' · ') || 'Medicinska sestra'}
+					</p>
+					<p class="mt-4 leading-relaxed text-pretty text-muted-foreground">{data.storyWinner.message}</p>
+				</div>
+			{/if}
+		</div>
+	</section>
+{/if}
+
+<!-- Privacy note -->
+<section class="mx-auto max-w-5xl px-4 pb-12">
+	<div class="flex items-center justify-center gap-3 rounded-2xl bg-muted px-5 py-4 text-center text-sm text-muted-foreground">
+		<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="shrink-0"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+		<p>Vaši podaci su sigurni i koristimo ih isključivo u svrhu ovog projekta.</p>
+	</div>
 </section>

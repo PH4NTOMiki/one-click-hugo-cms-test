@@ -1,79 +1,62 @@
 import { fail } from '@sveltejs/kit';
 import { randomUUID } from 'crypto';
+import { supabaseAdmin } from '$lib/server/supabaseAdmin';
 import type { Actions, PageServerLoad } from './$types';
 
 const VOTER_COOKIE = 'najsestra_voter';
 
-export const load: PageServerLoad = async ({ locals, cookies }) => {
-	const { data: nominees } = await locals.supabase
-		.from('nominees')
-		.select('id, name, workplace, city, created_at')
-		.eq('approved', true);
-
-	const { data: votes } = await locals.supabase.from('votes').select('nominee_id');
-
-	const counts = new Map<string, number>();
-	for (const v of votes ?? []) {
-		counts.set(v.nominee_id, (counts.get(v.nominee_id) ?? 0) + 1);
-	}
-
-	const list = (nominees ?? [])
-		.map((n) => ({ ...n, vote_count: counts.get(n.id) ?? 0 }))
-		.sort((a, b) => b.vote_count - a.vote_count || a.name.localeCompare(b.name));
-
+export const load: PageServerLoad = async ({ cookies }) => {
+	// The list of nurses is intentionally hidden — visitors must type the name.
+	// We only expose whether this browser has already voted.
 	const voterId = cookies.get(VOTER_COOKIE);
-	let votedNomineeId: string | null = null;
+	let hasVoted = false;
 	if (voterId) {
-		const { data: existing } = await locals.supabase
+		const { data: existing } = await supabaseAdmin
 			.from('votes')
-			.select('nominee_id')
+			.select('id')
 			.eq('voter_id', voterId)
 			.maybeSingle();
-		votedNomineeId = existing?.nominee_id ?? null;
+		hasVoted = !!existing;
 	}
-
-	return { nominees: list, votedNomineeId, totalVotes: votes?.length ?? 0 };
+	return { hasVoted };
 };
 
 export const actions: Actions = {
-	nominate: async ({ request, locals }) => {
+	vote: async ({ request, cookies }) => {
 		const form = await request.formData();
-		const name = String(form.get('name') ?? '').trim();
+		const firstName = String(form.get('first_name') ?? '').trim();
+		const lastName = String(form.get('last_name') ?? '').trim();
+		const name = [firstName, lastName].filter(Boolean).join(' ').trim();
 		const workplace = String(form.get('workplace') ?? '').trim();
 		const city = String(form.get('city') ?? '').trim();
+		const confirmPatient = form.get('confirm_patient') === 'on';
+		const acceptRules = form.get('accept_rules') === 'on';
 
-		if (name.length < 2) {
-			return fail(400, { nominateError: 'Unesite ime i prezime sestre.' });
+		const values = { firstName, lastName, workplace, city };
+
+		if (firstName.length < 2) {
+			return fail(400, { error: 'Unesite ime medicinske sestre.', values });
+		}
+		if (lastName.length < 2) {
+			return fail(400, { error: 'Unesite prezime medicinske sestre.', values });
+		}
+		if (workplace.length < 2) {
+			return fail(400, { error: 'Unesite ustanovu u kojoj sestra radi.', values });
+		}
+		if (!confirmPatient || !acceptRules) {
+			return fail(400, { error: 'Molimo potvrdite oba uvjeta za sudjelovanje.', values });
 		}
 
-		const { error } = await locals.supabase.from('nominees').insert({
-			name,
-			workplace: workplace || null,
-			city: city || null
-		});
-
-		if (error) {
-			return fail(500, { nominateError: 'Došlo je do pogreške. Pokušajte ponovno.' });
-		}
-		return { nominateSuccess: true };
-	},
-
-	vote: async ({ request, locals, cookies }) => {
-		const form = await request.formData();
-		const nomineeId = String(form.get('nominee_id') ?? '');
-		if (!nomineeId) return fail(400, { voteError: 'Nedostaje sestra za glasanje.' });
-
+		// One vote per browser.
 		let voterId = cookies.get(VOTER_COOKIE);
-
-		// Already voted? Block (one vote per browser).
 		if (voterId) {
-			const { data: existing } = await locals.supabase
+			const { data: existing } = await supabaseAdmin
 				.from('votes')
 				.select('id')
 				.eq('voter_id', voterId)
 				.maybeSingle();
 			if (existing) {
-				return fail(400, { voteError: 'Već ste glasali. Hvala!' });
+				return fail(400, { error: 'Već ste glasali. Hvala što ste sudjelovali!', values });
 			}
 		} else {
 			voterId = randomUUID();
@@ -85,13 +68,41 @@ export const actions: Actions = {
 			});
 		}
 
-		const { error } = await locals.supabase
+		// Find an existing nominee with the same name + workplace, otherwise create one.
+		const { data: match } = await supabaseAdmin
+			.from('nominees')
+			.select('id')
+			.ilike('name', name)
+			.ilike('workplace', workplace)
+			.limit(1)
+			.maybeSingle();
+
+		let nomineeId = match?.id;
+		if (!nomineeId) {
+			const { data: created, error: insertError } = await supabaseAdmin
+				.from('nominees')
+				.insert({
+					name,
+					first_name: firstName,
+					last_name: lastName,
+					workplace: workplace || null,
+					city: city || null
+				})
+				.select('id')
+				.single();
+			if (insertError || !created) {
+				return fail(500, { error: 'Došlo je do pogreške. Pokušajte ponovno.', values });
+			}
+			nomineeId = created.id;
+		}
+
+		const { error: voteError } = await supabaseAdmin
 			.from('votes')
 			.insert({ nominee_id: nomineeId, voter_id: voterId });
 
-		if (error) {
-			return fail(500, { voteError: 'Glasanje nije uspjelo. Pokušajte ponovno.' });
+		if (voteError) {
+			return fail(500, { error: 'Glasanje nije uspjelo. Pokušajte ponovno.', values });
 		}
-		return { voteSuccess: true };
+		return { success: true };
 	}
 };
