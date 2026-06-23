@@ -16,7 +16,7 @@
 
 <!-- Hero -->
 <section class="bg-card">
-	<div class="mx-auto grid max-w-5xl items-center gap-4 px-4 py-4 md:grid-cols-2 md:gap-8 md:py-16">
+	<div class="mx-auto grid max-w-5xl items-center gap-4 px-4 py-4 md:grid-cols-2 md:gap-8 md:py-8">
 		<div class="order-2 md:order-1">
 			<h1 class="text-xl font-extrabold leading-tight text-balance text-foreground sm:text-4xl md:text-5xl">
 				Naj medicinska sestra za dijabetes
@@ -30,7 +30,7 @@
 			<img
 				src="/nurse-hero.png"
 				alt="Medicinska sestra drži ruke starije pacijentice"
-				class="h-24 w-full object-cover object-top sm:h-44 md:h-full"
+				class="h-24 w-full object-cover object-top sm:h-44 md:h-56 lg:h-64"
 				width="640"
 				height="520"
 			/>
@@ -39,7 +39,7 @@
 </section>
 
 <!-- Two action cards -->
-<section class="mx-auto grid max-w-5xl gap-4 px-4 py-6 md:grid-cols-2 md:gap-6 md:py-12">
+<section class="mx-auto grid max-w-5xl gap-4 px-4 py-6 md:grid-cols-2 md:gap-6 md:pb-12 md:pt-2">
 	<article class="flex flex-col rounded-2xl bg-blue-soft p-5 md:p-8">
 		<span class="flex h-11 w-11 items-center justify-center rounded-xl bg-primary text-primary-foreground md:h-14 md:w-14 md:rounded-2xl">
 			<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg>
