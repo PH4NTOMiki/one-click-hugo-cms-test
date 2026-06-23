@@ -153,7 +153,7 @@
 										<span class="rounded-full bg-muted px-2 py-0.5 text-xs text-muted-foreground">{statusLabel[s.status]}</span>
 									</div>
 									<p class="text-sm text-muted-foreground">{[s.workplace, s.city].filter(Boolean).join(' · ') || '—'}</p>
-									<p class="mt-2 leading-relaxed text-pretty">{s.message}</p>
+									<p class="mt-2 whitespace-pre-wrap break-words leading-relaxed text-pretty">{s.message}</p>
 									{#if s.author_name || s.author_email}
 										<p class="mt-2 text-xs text-muted-foreground">Autor: {s.author_name ?? '—'} {s.author_email ? `(${s.author_email})` : ''}</p>
 									{/if}
