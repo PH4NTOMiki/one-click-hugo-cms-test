@@ -39,6 +39,21 @@
  */
 declare module '$env/static/private' {
 	export const AI_GATEWAY_API_KEY: string;
+	export const SUPABASE_SECRET_KEY: string;
+	export const SUPABASE_ANON_KEY: string;
+	export const POSTGRES_PASSWORD: string;
+	export const POSTGRES_PRISMA_URL: string;
+	export const SUPABASE_URL: string;
+	export const POSTGRES_URL_NON_POOLING: string;
+	export const POSTGRES_USER: string;
+	export const POSTGRES_DATABASE: string;
+	export const SUPABASE_SERVICE_ROLE_KEY: string;
+	export const SUPABASE_JWT_SECRET: string;
+	export const POSTGRES_URL: string;
+	export const POSTGRES_HOST: string;
+	export const SUPABASE_PUBLISHABLE_KEY: string;
+	export const VERCEL_WEB_ANALYTICS_ID: string;
+	export const VERCEL_OIDC_TOKEN: string;
 	export const V0_RUNTIME_URL: string;
 	export const V0_CALLBACK_URL: string;
 	export const npm_command: string;
@@ -166,7 +181,10 @@ declare module '$env/static/private' {
  * The above values will be the same _even if_ different values for `ENVIRONMENT` or `PUBLIC_BASE_URL` are set at runtime, as they are statically replaced in your code with their build time values.
  */
 declare module '$env/static/public' {
-	
+	export const NEXT_PUBLIC_SUPABASE_URL: string;
+	export const NEXT_PUBLIC_SUPABASE_ANON_KEY: string;
+	export const NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: string;
+	export const NEXT_PUBLIC_DEV_SUPABASE_REDIRECT_URL: string;
 }
 
 /**
@@ -217,6 +235,21 @@ declare module '$env/static/public' {
 declare module '$env/dynamic/private' {
 	export const env: {
 		AI_GATEWAY_API_KEY: string;
+		SUPABASE_SECRET_KEY: string;
+		SUPABASE_ANON_KEY: string;
+		POSTGRES_PASSWORD: string;
+		POSTGRES_PRISMA_URL: string;
+		SUPABASE_URL: string;
+		POSTGRES_URL_NON_POOLING: string;
+		POSTGRES_USER: string;
+		POSTGRES_DATABASE: string;
+		SUPABASE_SERVICE_ROLE_KEY: string;
+		SUPABASE_JWT_SECRET: string;
+		POSTGRES_URL: string;
+		POSTGRES_HOST: string;
+		SUPABASE_PUBLISHABLE_KEY: string;
+		VERCEL_WEB_ANALYTICS_ID: string;
+		VERCEL_OIDC_TOKEN: string;
 		V0_RUNTIME_URL: string;
 		V0_CALLBACK_URL: string;
 		npm_command: string;
@@ -363,6 +396,10 @@ declare module '$env/dynamic/private' {
  */
 declare module '$env/dynamic/public' {
 	export const env: {
+		NEXT_PUBLIC_SUPABASE_URL: string;
+		NEXT_PUBLIC_SUPABASE_ANON_KEY: string;
+		NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: string;
+		NEXT_PUBLIC_DEV_SUPABASE_REDIRECT_URL: string;
 		[key: `NEXT_PUBLIC_${string}`]: string | undefined;
 	}
 }
