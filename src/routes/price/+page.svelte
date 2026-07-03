@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
+	import { t } from '$lib/content';
 	import type { ActionData } from './$types';
 
 	let { form }: { form: ActionData } = $props();
@@ -26,9 +27,9 @@
 				<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
 			</span>
 			<div>
-				<h1 class="text-xl font-bold">Priča koja inspirira</h1>
+				<h1 class="text-xl font-bold">{t('story_title')}</h1>
 				<p class="mt-1 text-sm text-accent-foreground/85">
-					Podijelite svoju priču o medicinskoj sestri.
+					{t('story_subtitle')}
 				</p>
 			</div>
 		</div>
@@ -36,8 +37,8 @@
 		<div class="p-6">
 			{#if form?.success}
 				<div class="rounded-xl bg-accent/10 px-4 py-4 text-sm text-accent">
-					<p class="font-semibold">Hvala! Vaša priča je poslana.</p>
-					<p class="mt-1">Naše uredništvo pažljivo čita svaku priču prije objave.</p>
+					<p class="font-semibold">{t('story_success_title')}</p>
+					<p class="mt-1">{t('story_success_text')}</p>
 				</div>
 			{:else}
 				<form method="POST" action="?/submit" use:enhance class="grid gap-4">
@@ -94,7 +95,7 @@
 					<button type="submit"
 						class="inline-flex items-center justify-center gap-2 rounded-xl bg-accent px-5 py-3 font-semibold text-accent-foreground transition-opacity hover:opacity-90">
 						<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg>
-						Pošalji priču
+						{t('story_button')}
 					</button>
 				</form>
 			{/if}

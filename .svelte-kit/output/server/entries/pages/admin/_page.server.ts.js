@@ -1,25 +1,46 @@
 import { fail, redirect } from "@sveltejs/kit";
+import { c as contentFields, d as defaultContent } from "../../../chunks/defaults.js";
 const load = async ({ locals }) => {
-  const { data: nominees } = await locals.supabase.from("nominees").select("id, name, workplace, city, approved, created_at").order("created_at", { ascending: false });
+  const { data: nominees } = await locals.supabase.from("nominees").select("id, name, first_name, last_name, workplace, city, approved, is_winner, created_at").order("created_at", { ascending: false });
   const { data: votes } = await locals.supabase.from("votes").select("nominee_id");
   const counts = /* @__PURE__ */ new Map();
   for (const v of votes ?? []) counts.set(v.nominee_id, (counts.get(v.nominee_id) ?? 0) + 1);
   const nomineeList = (nominees ?? []).map((n) => ({ ...n, vote_count: counts.get(n.id) ?? 0 })).sort((a, b) => b.vote_count - a.vote_count);
   const { data: stories } = await locals.supabase.from("stories").select("*").order("created_at", { ascending: false });
-  return { nominees: nomineeList, stories: stories ?? [] };
+  const { data: contentRows } = await locals.supabase.from("site_content").select("key, value");
+  const content = { ...defaultContent };
+  for (const row of contentRows ?? []) {
+    if (row.key in content && typeof row.value === "string") content[row.key] = row.value;
+  }
+  return { nominees: nomineeList, stories: stories ?? [], content, contentFields };
 };
 const actions = {
   logout: async ({ locals }) => {
     await locals.supabase.auth.signOut();
     throw redirect(303, "/admin/login");
   },
+  saveContent: async ({ request, locals }) => {
+    const f = await request.formData();
+    const rows = contentFields.map((field) => ({
+      key: field.key,
+      value: String(f.get(field.key) ?? field.default),
+      updated_at: (/* @__PURE__ */ new Date()).toISOString()
+    }));
+    const { error } = await locals.supabase.from("site_content").upsert(rows, { onConflict: "key" });
+    if (error) return fail(500, { error: "Spremanje tekstova nije uspjelo." });
+    return { success: true, savedContent: true };
+  },
   updateNominee: async ({ request, locals }) => {
     const f = await request.formData();
     const id = String(f.get("id"));
-    const name = String(f.get("name") ?? "").trim();
+    const firstName = String(f.get("first_name") ?? "").trim();
+    const lastName = String(f.get("last_name") ?? "").trim();
+    const name = [firstName, lastName].filter(Boolean).join(" ").trim();
     if (name.length < 2) return fail(400, { error: "Ime je obavezno." });
     const { error } = await locals.supabase.from("nominees").update({
       name,
+      first_name: firstName || null,
+      last_name: lastName || null,
       workplace: String(f.get("workplace") ?? "").trim() || null,
       city: String(f.get("city") ?? "").trim() || null,
       approved: f.get("approved") === "on"
@@ -33,12 +54,31 @@ const actions = {
     if (error) return fail(500, { error: "Brisanje nije uspjelo." });
     return { success: true };
   },
+  setVoteWinner: async ({ request, locals }) => {
+    const f = await request.formData();
+    const id = String(f.get("id"));
+    await locals.supabase.from("nominees").update({ is_winner: false }).eq("is_winner", true);
+    const { error } = await locals.supabase.from("nominees").update({ is_winner: true, approved: true }).eq("id", id);
+    if (error) return fail(500, { error: "Postavljanje pobjednika nije uspjelo." });
+    return { success: true };
+  },
+  clearVoteWinner: async ({ request, locals }) => {
+    const f = await request.formData();
+    const { error } = await locals.supabase.from("nominees").update({ is_winner: false }).eq("id", String(f.get("id")));
+    if (error) return fail(500, { error: "Greška." });
+    return { success: true };
+  },
   updateStory: async ({ request, locals }) => {
     const f = await request.formData();
     const id = String(f.get("id"));
     const status = String(f.get("status") ?? "pending");
+    const firstName = String(f.get("first_name") ?? "").trim();
+    const lastName = String(f.get("last_name") ?? "").trim();
+    const nurseName = [firstName, lastName].filter(Boolean).join(" ").trim();
     const { error } = await locals.supabase.from("stories").update({
-      nurse_name: String(f.get("nurse_name") ?? "").trim(),
+      nurse_name: nurseName,
+      first_name: firstName || null,
+      last_name: lastName || null,
       workplace: String(f.get("workplace") ?? "").trim() || null,
       city: String(f.get("city") ?? "").trim() || null,
       message: String(f.get("message") ?? "").trim(),

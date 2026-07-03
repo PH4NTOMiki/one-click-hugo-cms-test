@@ -7,10 +7,10 @@ function __memo(fn) {
 return {
 	appDir: "_app",
 	appPath: "_app",
-	assets: new Set(["favicon.svg"]),
-	mimeTypes: {".svg":"image/svg+xml"},
+	assets: new Set(["favicon.svg","najsestra-logo.jpeg","najsestra-mark.jpeg","nurse-hero.png","nurse.jpeg"]),
+	mimeTypes: {".svg":"image/svg+xml",".jpeg":"image/jpeg",".png":"image/png"},
 	_: {
-		client: {start:"_app/immutable/entry/start.SO0FUrzE.js",app:"_app/immutable/entry/app.CDftT0xP.js",imports:["_app/immutable/entry/start.SO0FUrzE.js","_app/immutable/chunks/V76sW0YR.js","_app/immutable/chunks/BzpXGMbD.js","_app/immutable/chunks/BcGmjZuA.js","_app/immutable/entry/app.CDftT0xP.js","_app/immutable/chunks/BcGmjZuA.js","_app/immutable/chunks/BzpXGMbD.js","_app/immutable/chunks/CWj6FrbW.js","_app/immutable/chunks/BVu0bHin.js","_app/immutable/chunks/_Hi3jACY.js","_app/immutable/chunks/BWn82y1R.js"],stylesheets:[],fonts:[],uses_env_dynamic_public:false},
+		client: {start:"_app/immutable/entry/start.B3l349qw.js",app:"_app/immutable/entry/app.B5yLb4rP.js",imports:["_app/immutable/entry/start.B3l349qw.js","_app/immutable/chunks/RL9zNp0A.js","_app/immutable/chunks/DPGshX3i.js","_app/immutable/chunks/CXJWxXjp.js","_app/immutable/chunks/D9iyWlf1.js","_app/immutable/entry/app.B5yLb4rP.js","_app/immutable/chunks/CXJWxXjp.js","_app/immutable/chunks/D9iyWlf1.js","_app/immutable/chunks/CWj6FrbW.js","_app/immutable/chunks/DPGshX3i.js","_app/immutable/chunks/Bq5wUYFV.js","_app/immutable/chunks/-raVBbL2.js","_app/immutable/chunks/D4XZ-XBO.js"],stylesheets:[],fonts:[],uses_env_dynamic_public:false},
 		nodes: [
 			__memo(() => import('../output/server/nodes/0.js')),
 			__memo(() => import('../output/server/nodes/1.js')),
@@ -38,6 +38,13 @@ return {
 				params: [],
 				page: { layouts: [0,2,], errors: [1,,], leaf: 4 },
 				endpoint: null
+			},
+			{
+				id: "/admin/export",
+				pattern: /^\/admin\/export\/?$/,
+				params: [],
+				page: null,
+				endpoint: __memo(() => import('../output/server/entries/endpoints/admin/export/_server.ts.js'))
 			},
 			{
 				id: "/admin/login",

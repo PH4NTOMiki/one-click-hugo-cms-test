@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
+	import { t } from '$lib/content';
 	import type { PageData, ActionData } from './$types';
 
 	let { data, form }: { data: PageData; form: ActionData } = $props();
@@ -25,9 +26,9 @@
 				<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg>
 			</span>
 			<div>
-				<h1 class="text-xl font-bold">Nominacija – Priznanje pacijenata</h1>
+				<h1 class="text-xl font-bold">{t('vote_title')}</h1>
 				<p class="mt-1 text-sm text-primary-foreground/85">
-					Ispunite obrazac i predložite medicinsku sestru.
+					{t('vote_subtitle')}
 				</p>
 			</div>
 		</div>
@@ -35,8 +36,8 @@
 		<div class="p-6">
 			{#if done}
 				<div class="rounded-xl bg-primary/10 px-4 py-4 text-sm text-primary">
-					<p class="font-semibold">Hvala! Vaš glas je zabilježen.</p>
-					<p class="mt-1">Svaki posjetitelj ima jedan glas. Podijelite stranicu kako bi i drugi glasali.</p>
+					<p class="font-semibold">{t('vote_success_title')}</p>
+					<p class="mt-1">{t('vote_success_text')}</p>
 				</div>
 			{:else}
 				<form method="POST" action="?/vote" use:enhance class="grid gap-4">
@@ -85,7 +86,7 @@
 					<button type="submit"
 						class="inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-5 py-3 font-semibold text-primary-foreground transition-opacity hover:opacity-90">
 						<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg>
-						Pošalji nominaciju
+						{t('vote_button')}
 					</button>
 				</form>
 			{/if}

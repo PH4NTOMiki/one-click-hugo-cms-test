@@ -1,5 +1,6 @@
 <script lang="ts">
 	import type { PageData } from "./$types";
+	import { t } from "$lib/content";
 
 	let { data }: { data: PageData } = $props();
 
@@ -23,15 +24,13 @@
 			<h1
 				class="text-3xl font-extrabold leading-tight text-balance text-foreground sm:text-4xl md:text-5xl"
 			>
-				Zahvalimo sestrama koje čine razliku.
+				{t('home_hero_title')}
 				<span class="text-accent">♥</span>
 			</h1>
 			<p
 				class="mt-3 max-w-md leading-relaxed text-muted-foreground text-pretty md:mt-5 md:text-lg"
 			>
-				Predložite medicinsku sestru koja vam je svojim znanjem i ljudskošću
-				ostavila trag; a mi ćemo dvije odvesti u Pariz na konferenciju o
-				dijabetesu!
+				{t('home_hero_subtitle')}
 			</p>
 		</div>
 		<div class="order-1 overflow-hidden rounded-2xl md:order-2 md:rounded-3xl">
@@ -52,19 +51,18 @@
 >
 	<article class="flex flex-col rounded-2xl bg-blue-soft p-5 md:p-8">
 		<h2 class="flex items-center gap-2 text-xl font-bold text-primary md:text-2xl">
-			Priznanje pacijenata
+			{t('home_card1_title')}
 		</h2>
 		<p
 			class="mt-2 flex-1 text-sm leading-relaxed text-muted-foreground text-pretty md:mt-3 md:text-base"
 		>
-			Nominirajte medicinsku sestru koja je svojim radom i podrškom ostavila
-			poseban trag u vašem životu.
+			{t('home_card1_text')}
 		</p>
 		<a
 			href="/glasanje"
 			class="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-primary px-5 py-3 font-semibold text-primary-foreground transition-opacity hover:opacity-90 md:mt-6 md:py-3.5"
 		>
-			Predloži sestru
+			{t('home_card1_button')}
 			<svg
 				xmlns="http://www.w3.org/2000/svg"
 				width="18"
@@ -82,19 +80,18 @@
 
 	<article class="flex flex-col rounded-2xl bg-red-soft p-5 md:p-8">
 		<h2 class="flex items-center gap-2 text-xl font-bold text-accent md:text-2xl">
-			Priča koja inspirira
+			{t('home_card2_title')}
 		</h2>
 		<p
 			class="mt-2 flex-1 text-sm leading-relaxed text-muted-foreground text-pretty md:mt-3 md:text-base"
 		>
-			Podijelite svoju osobnu priču o medicinskoj sestri koja je pokazala
-			iznimnu predanost, stručnost i ljudskost.
+			{t('home_card2_text')}
 		</p>
 		<a
 			href="/price"
 			class="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-accent px-5 py-3 font-semibold text-accent-foreground transition-opacity hover:opacity-90 md:mt-6 md:py-3.5"
 		>
-			Napiši svoju priču
+			{t('home_card2_button')}
 			<svg
 				xmlns="http://www.w3.org/2000/svg"
 				width="18"
@@ -136,12 +133,11 @@
 						d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"
 					/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z" /></svg
 				>
-				Pobjednice
+				{t('home_winners_badge')}
 			</span>
-			<h2 class="mt-3 text-3xl font-extrabold">Čestitamo našim pobjednicama</h2>
+			<h2 class="mt-3 text-3xl font-extrabold">{t('home_winners_title')}</h2>
 			<p class="mx-auto mt-2 max-w-xl leading-relaxed text-muted-foreground">
-				Hvala svima koji su glasali i podijelili svoje priče. Ovo su sestre koje
-				su ostavile najveći trag.
+				{t('home_winners_subtitle')}
 			</p>
 		</div>
 
@@ -150,7 +146,7 @@
 				<div class="rounded-2xl border-2 border-primary bg-card p-7">
 					<span
 						class="text-xs font-semibold uppercase tracking-wider text-primary"
-						>Nagrada pacijenata</span
+						>{t('home_winners_vote_label')}</span
 					>
 					<h3 class="mt-2 text-2xl font-bold">{data.voteWinner.name}</h3>
 					<p class="mt-1 text-sm text-muted-foreground">
@@ -159,7 +155,7 @@
 							.join(" · ") || "Medicinska sestra"}
 					</p>
 					<p class="mt-4 leading-relaxed text-pretty">
-						Sestra s najviše glasova pacijenata i njihovih obitelji.
+						{t('home_winners_vote_caption')}
 					</p>
 				</div>
 			{/if}
@@ -168,7 +164,7 @@
 				<div class="rounded-2xl border-2 border-accent bg-card p-7">
 					<span
 						class="text-xs font-semibold uppercase tracking-wider text-accent"
-						>Priča koja inspirira</span
+						>{t('home_winners_story_label')}</span
 					>
 					<h3 class="mt-2 text-2xl font-bold">{data.storyWinner.nurse_name}</h3>
 					<p class="mt-1 text-sm text-muted-foreground">
@@ -206,7 +202,7 @@
 			/></svg
 		>
 		<p>
-			Vaši podaci su sigurni i koristimo ih isključivo u svrhu ovog projekta.
+			{t('home_privacy')}
 		</p>
 	</div>
 </section>

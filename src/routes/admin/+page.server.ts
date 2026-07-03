@@ -1,5 +1,6 @@
 import { fail, redirect } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
+import { contentFields, defaultContent } from '$lib/content/defaults';
 
 export const load: PageServerLoad = async ({ locals }) => {
 	const { data: nominees } = await locals.supabase
@@ -20,13 +21,33 @@ export const load: PageServerLoad = async ({ locals }) => {
 		.select('*')
 		.order('created_at', { ascending: false });
 
-	return { nominees: nomineeList, stories: stories ?? [] };
+	// Editable site text: start from defaults, overlay any saved values.
+	const { data: contentRows } = await locals.supabase.from('site_content').select('key, value');
+	const content: Record<string, string> = { ...defaultContent };
+	for (const row of contentRows ?? []) {
+		if (row.key in content && typeof row.value === 'string') content[row.key] = row.value;
+	}
+
+	return { nominees: nomineeList, stories: stories ?? [], content, contentFields };
 };
 
 export const actions: Actions = {
 	logout: async ({ locals }) => {
 		await locals.supabase.auth.signOut();
 		throw redirect(303, '/admin/login');
+	},
+
+	saveContent: async ({ request, locals }) => {
+		const f = await request.formData();
+		// Only accept known keys; ignore anything else submitted.
+		const rows = contentFields.map((field) => ({
+			key: field.key,
+			value: String(f.get(field.key) ?? field.default),
+			updated_at: new Date().toISOString()
+		}));
+		const { error } = await locals.supabase.from('site_content').upsert(rows, { onConflict: 'key' });
+		if (error) return fail(500, { error: 'Spremanje tekstova nije uspjelo.' });
+		return { success: true, savedContent: true };
 	},
 
 	updateNominee: async ({ request, locals }) => {

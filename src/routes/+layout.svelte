@@ -2,6 +2,7 @@
 	import '../app.css';
 	import { page } from '$app/stores';
 	import Sponsors from '$lib/components/Sponsors.svelte';
+	import { t } from '$lib/content';
 
 	let { children } = $props();
 
@@ -22,8 +23,8 @@
 				</a>
 
 				<nav class="hidden items-center gap-2 sm:flex">
-					<a href="/glasanje" class="rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground">Glasaj za sestru</a>
-					<a href="/price" class="rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground">Napiši priču</a>
+					<a href="/glasanje" class="rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground">{t('nav_vote')}</a>
+					<a href="/price" class="rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground">{t('nav_story')}</a>
 				</nav>
 
 				<button
@@ -43,8 +44,8 @@
 
 			{#if menuOpen}
 				<nav class="border-t border-border px-4 py-2 sm:hidden">
-					<a href="/glasanje" onclick={() => (menuOpen = false)} class="block rounded-lg px-3 py-3 text-sm font-medium text-foreground transition-colors hover:bg-muted">Glasaj za sestru</a>
-					<a href="/price" onclick={() => (menuOpen = false)} class="block rounded-lg px-3 py-3 text-sm font-medium text-foreground transition-colors hover:bg-muted">Napiši priču</a>
+					<a href="/glasanje" onclick={() => (menuOpen = false)} class="block rounded-lg px-3 py-3 text-sm font-medium text-foreground transition-colors hover:bg-muted">{t('nav_vote')}</a>
+					<a href="/price" onclick={() => (menuOpen = false)} class="block rounded-lg px-3 py-3 text-sm font-medium text-foreground transition-colors hover:bg-muted">{t('nav_story')}</a>
 				</nav>
 			{/if}
 		</header>
@@ -58,8 +59,8 @@
 		<Sponsors />
 		<footer class="border-t border-border bg-card">
 			<div class="mx-auto flex max-w-5xl flex-col items-center justify-between gap-2 px-4 py-6 text-sm text-muted-foreground sm:flex-row">
-				<p>najMedicinska SESTRA — priznanje sestrama za dijabetes</p>
-				<a href="/admin" class="transition-colors hover:text-foreground">Uredništvo</a>
+				<p>{t('footer_text')}</p>
+				<a href="/admin" class="transition-colors hover:text-foreground">{t('footer_admin')}</a>
 			</div>
 		</footer>
 	{/if}

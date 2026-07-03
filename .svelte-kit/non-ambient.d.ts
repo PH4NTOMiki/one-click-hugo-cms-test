@@ -43,6 +43,6 @@ declare module "$app/types" {
 		};
 		Pathname(): "/" | "/admin" | "/admin/export" | "/admin/login" | "/glasanje" | "/price";
 		ResolvedPathname(): `${"" | `/${string}`}${ReturnType<AppTypes['Pathname']>}`;
-		Asset(): "/favicon.svg" | "/nurse-hero.png" | string & {};
+		Asset(): "/favicon.svg" | "/najsestra-logo.jpeg" | "/najsestra-mark.jpeg" | "/nurse-hero.png" | "/nurse.jpeg" | string & {};
 	}
 }

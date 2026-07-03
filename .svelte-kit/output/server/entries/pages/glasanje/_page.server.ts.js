@@ -1,50 +1,49 @@
 import { fail } from "@sveltejs/kit";
 import { randomUUID } from "crypto";
+import { createClient } from "@supabase/supabase-js";
+import { P as PUBLIC_SUPABASE_URL } from "../../../chunks/config.js";
+const SUPABASE_SERVICE_ROLE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZjeWV4d2txd2R2cHRjeHNlb3huIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc4MzA5MTMyOSwiZXhwIjoyMDk4NjY3MzI5fQ.q8Hb7QKQmbeDtyAfOAIKOTTPOdg5tUfc3ulBos1HHbs";
+const supabaseAdmin = createClient(PUBLIC_SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, {
+  auth: { persistSession: false, autoRefreshToken: false }
+});
 const VOTER_COOKIE = "najsestra_voter";
-const load = async ({ locals, cookies }) => {
-  const { data: nominees } = await locals.supabase.from("nominees").select("id, name, workplace, city, created_at").eq("approved", true);
-  const { data: votes } = await locals.supabase.from("votes").select("nominee_id");
-  const counts = /* @__PURE__ */ new Map();
-  for (const v of votes ?? []) {
-    counts.set(v.nominee_id, (counts.get(v.nominee_id) ?? 0) + 1);
-  }
-  const list = (nominees ?? []).map((n) => ({ ...n, vote_count: counts.get(n.id) ?? 0 })).sort((a, b) => b.vote_count - a.vote_count || a.name.localeCompare(b.name));
+const load = async ({ cookies }) => {
   const voterId = cookies.get(VOTER_COOKIE);
-  let votedNomineeId = null;
+  let hasVoted = false;
   if (voterId) {
-    const { data: existing } = await locals.supabase.from("votes").select("nominee_id").eq("voter_id", voterId).maybeSingle();
-    votedNomineeId = existing?.nominee_id ?? null;
+    const { data: existing } = await supabaseAdmin.from("votes").select("id").eq("voter_id", voterId).maybeSingle();
+    hasVoted = !!existing;
   }
-  return { nominees: list, votedNomineeId, totalVotes: votes?.length ?? 0 };
+  return { hasVoted };
 };
 const actions = {
-  nominate: async ({ request, locals }) => {
+  vote: async ({ request, cookies }) => {
     const form = await request.formData();
-    const name = String(form.get("name") ?? "").trim();
+    const firstName = String(form.get("first_name") ?? "").trim();
+    const lastName = String(form.get("last_name") ?? "").trim();
+    const name = [firstName, lastName].filter(Boolean).join(" ").trim();
     const workplace = String(form.get("workplace") ?? "").trim();
     const city = String(form.get("city") ?? "").trim();
-    if (name.length < 2) {
-      return fail(400, { nominateError: "Unesite ime i prezime sestre." });
+    const confirmPatient = form.get("confirm_patient") === "on";
+    const acceptRules = form.get("accept_rules") === "on";
+    const values = { firstName, lastName, workplace, city };
+    if (firstName.length < 2) {
+      return fail(400, { error: "Unesite ime medicinske sestre.", values });
     }
-    const { error } = await locals.supabase.from("nominees").insert({
-      name,
-      workplace: workplace || null,
-      city: city || null
-    });
-    if (error) {
-      return fail(500, { nominateError: "Došlo je do pogreške. Pokušajte ponovno." });
+    if (lastName.length < 2) {
+      return fail(400, { error: "Unesite prezime medicinske sestre.", values });
     }
-    return { nominateSuccess: true };
-  },
-  vote: async ({ request, locals, cookies }) => {
-    const form = await request.formData();
-    const nomineeId = String(form.get("nominee_id") ?? "");
-    if (!nomineeId) return fail(400, { voteError: "Nedostaje sestra za glasanje." });
+    if (workplace.length < 2) {
+      return fail(400, { error: "Unesite ustanovu u kojoj sestra radi.", values });
+    }
+    if (!confirmPatient || !acceptRules) {
+      return fail(400, { error: "Molimo potvrdite oba uvjeta za sudjelovanje.", values });
+    }
     let voterId = cookies.get(VOTER_COOKIE);
     if (voterId) {
-      const { data: existing } = await locals.supabase.from("votes").select("id").eq("voter_id", voterId).maybeSingle();
+      const { data: existing } = await supabaseAdmin.from("votes").select("id").eq("voter_id", voterId).maybeSingle();
       if (existing) {
-        return fail(400, { voteError: "Već ste glasali. Hvala!" });
+        return fail(400, { error: "Već ste glasali. Hvala što ste sudjelovali!", values });
       }
     } else {
       voterId = randomUUID();
@@ -55,11 +54,26 @@ const actions = {
         sameSite: "lax"
       });
     }
-    const { error } = await locals.supabase.from("votes").insert({ nominee_id: nomineeId, voter_id: voterId });
-    if (error) {
-      return fail(500, { voteError: "Glasanje nije uspjelo. Pokušajte ponovno." });
+    const { data: match } = await supabaseAdmin.from("nominees").select("id").ilike("name", name).ilike("workplace", workplace).limit(1).maybeSingle();
+    let nomineeId = match?.id;
+    if (!nomineeId) {
+      const { data: created, error: insertError } = await supabaseAdmin.from("nominees").insert({
+        name,
+        first_name: firstName,
+        last_name: lastName,
+        workplace: workplace || null,
+        city: city || null
+      }).select("id").single();
+      if (insertError || !created) {
+        return fail(500, { error: "Došlo je do pogreške. Pokušajte ponovno.", values });
+      }
+      nomineeId = created.id;
     }
-    return { voteSuccess: true };
+    const { error: voteError } = await supabaseAdmin.from("votes").insert({ nominee_id: nomineeId, voter_id: voterId });
+    if (voteError) {
+      return fail(500, { error: "Glasanje nije uspjelo. Pokušajte ponovno.", values });
+    }
+    return { success: true };
   }
 };
 export {

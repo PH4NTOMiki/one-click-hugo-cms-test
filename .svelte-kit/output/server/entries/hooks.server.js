@@ -1,8 +1,5 @@
 import { createServerClient } from "@supabase/ssr";
-const NEXT_PUBLIC_SUPABASE_URL = "https://dwssavtekecfbfzkzsxh.supabase.co";
-const NEXT_PUBLIC_SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR3c3NhdnRla2VjZmJmemt6c3hoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIxNDE3NjksImV4cCI6MjA5NzcxNzc2OX0.-3l_PydEig8E84vbQ7Tg1l8eae2d0mYHBy1NMf5hVJw";
-const PUBLIC_SUPABASE_URL = NEXT_PUBLIC_SUPABASE_URL;
-const PUBLIC_SUPABASE_ANON_KEY = NEXT_PUBLIC_SUPABASE_ANON_KEY;
+import { P as PUBLIC_SUPABASE_URL, a as PUBLIC_SUPABASE_ANON_KEY } from "../chunks/config.js";
 const handle = async ({ event, resolve }) => {
   event.locals.supabase = createServerClient(PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY, {
     cookies: {

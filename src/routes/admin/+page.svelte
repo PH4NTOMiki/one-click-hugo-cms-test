@@ -4,7 +4,18 @@
 
 	let { data, form }: { data: PageData; form: ActionData } = $props();
 
-	let tab = $state<'votes' | 'stories'>('votes');
+	let tab = $state<'votes' | 'stories' | 'content'>('votes');
+
+	// Group the editable content fields by their section for the editor UI.
+	const contentByGroup = $derived.by(() => {
+		const groups = new Map<string, typeof data.contentFields>();
+		for (const field of data.contentFields) {
+			const list = groups.get(field.group) ?? [];
+			list.push(field);
+			groups.set(field.group, list);
+		}
+		return [...groups.entries()];
+	});
 	let editingNominee = $state<string | null>(null);
 	let editingStory = $state<string | null>(null);
 
@@ -84,6 +95,10 @@
 				class="rounded-lg px-4 py-2 text-sm font-medium transition-colors {tab === 'stories' ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:text-foreground'}">
 				Priče ({data.stories.length})
 			</button>
+			<button onclick={() => (tab = 'content')}
+				class="rounded-lg px-4 py-2 text-sm font-medium transition-colors {tab === 'content' ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:text-foreground'}">
+				Tekstovi
+			</button>
 		</div>
 
 		{#if form?.error}
@@ -91,6 +106,7 @@
 		{/if}
 
 		<!-- Toolbar: search, sort, filter, export -->
+		{#if tab !== 'content'}
 		<div class="mt-6 flex flex-wrap items-center gap-3">
 			<div class="relative flex-1 min-w-[200px]">
 				<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
@@ -140,6 +156,7 @@
 				</a>
 			{/if}
 		</div>
+		{/if}
 
 		<!-- VOTES TAB -->
 		{#if tab === 'votes'}
@@ -274,6 +291,54 @@
 					<p class="rounded-xl border border-dashed border-border bg-card p-8 text-center text-muted-foreground">Nema rezultata.</p>
 				{/each}
 			</div>
+		{/if}
+
+		<!-- CONTENT (TEXTS) TAB -->
+		{#if tab === 'content'}
+			{#if form?.savedContent}
+				<div class="mt-6 rounded-xl border border-primary/30 bg-primary/10 px-4 py-3 text-sm text-primary">
+					Tekstovi su spremljeni. Promjene će se pojaviti na stranici nakon sljedeće objave (redeploy).
+				</div>
+			{/if}
+
+			<div class="mt-6 flex items-start gap-3 rounded-xl border border-border bg-muted px-4 py-3 text-sm text-muted-foreground">
+				<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mt-0.5 shrink-0"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+				<p>
+					Ovdje uređujete tekstove i natpise na gumbima. Nakon što spremite, potrebno je
+					<strong class="text-foreground">ponovno objaviti stranicu</strong> (u Vercelu kliknite „Redeploy”, ili se to dogodi automatski kod nove objave) kako bi izmjene postale vidljive posjetiteljima.
+				</p>
+			</div>
+
+			<form method="POST" action="?/saveContent" use:enhance class="mt-6 grid gap-8">
+				{#each contentByGroup as [group, fields] (group)}
+					<section class="rounded-xl border border-border bg-card p-5">
+						<h2 class="text-lg font-semibold">{group}</h2>
+						<div class="mt-4 grid gap-5">
+							{#each fields as field (field.key)}
+								<div class="grid gap-1.5">
+									<label for={field.key} class="text-sm font-medium">{field.label}</label>
+									{#if field.multiline}
+										<textarea id={field.key} name={field.key} rows="3"
+											class="resize-y rounded-lg border border-input bg-background px-3 py-2 text-sm outline-none transition-colors focus:border-primary"
+										>{data.content[field.key]}</textarea>
+									{:else}
+										<input id={field.key} name={field.key} value={data.content[field.key]}
+											class="rounded-lg border border-input bg-background px-3 py-2 text-sm outline-none transition-colors focus:border-primary" />
+									{/if}
+								</div>
+							{/each}
+						</div>
+					</section>
+				{/each}
+
+				<div class="sticky bottom-4 flex items-center gap-3 rounded-xl border border-border bg-card/95 p-3 backdrop-blur">
+					<button class="inline-flex items-center gap-2 rounded-lg bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90">
+						<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+						Spremi tekstove
+					</button>
+					<span class="text-xs text-muted-foreground">Vidljivo nakon ponovne objave stranice.</span>
+				</div>
+			</form>
 		{/if}
 	</main>
 </div>

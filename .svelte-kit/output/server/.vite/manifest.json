@@ -10,6 +10,14 @@
       "_internal.js"
     ]
   },
+  "_config.js": {
+    "file": "chunks/config.js",
+    "name": "config"
+  },
+  "_defaults.js": {
+    "file": "chunks/defaults.js",
+    "name": "defaults"
+  },
   "_exports.js": {
     "file": "chunks/exports.js",
     "name": "exports"
@@ -26,6 +34,13 @@
     "name": "index",
     "imports": [
       "_index.js"
+    ]
+  },
+  "_index3.js": {
+    "file": "chunks/index3.js",
+    "name": "index",
+    "imports": [
+      "_defaults.js"
     ]
   },
   "_internal.js": {
@@ -126,7 +141,10 @@
     "name": "entries/hooks.server",
     "src": "src/hooks.server.ts",
     "isEntry": true,
-    "isDynamicEntry": true
+    "isDynamicEntry": true,
+    "imports": [
+      "_config.js"
+    ]
   },
   "src/routes/+layout.server.ts": {
     "file": "entries/pages/_layout.server.ts.js",
@@ -144,11 +162,18 @@
       "_exports.js",
       "_utils2.js",
       "_root.js",
-      "_state.svelte.js"
+      "_state.svelte.js",
+      "_index3.js"
     ],
     "css": [
-      "_app/immutable/assets/_layout.D-tF1CzP.css"
+      "_app/immutable/assets/_layout.D3Wo743b.css"
     ]
+  },
+  "src/routes/+page.server.ts": {
+    "file": "entries/pages/_page.server.ts.js",
+    "name": "entries/pages/_page.server.ts",
+    "src": "src/routes/+page.server.ts",
+    "isEntry": true
   },
   "src/routes/+page.svelte": {
     "file": "entries/pages/_page.svelte.js",
@@ -156,7 +181,8 @@
     "src": "src/routes/+page.svelte",
     "isEntry": true,
     "imports": [
-      "_index.js"
+      "_index.js",
+      "_index3.js"
     ]
   },
   "src/routes/admin/+layout.server.ts": {
@@ -169,7 +195,10 @@
     "file": "entries/pages/admin/_page.server.ts.js",
     "name": "entries/pages/admin/_page.server.ts",
     "src": "src/routes/admin/+page.server.ts",
-    "isEntry": true
+    "isEntry": true,
+    "imports": [
+      "_defaults.js"
+    ]
   },
   "src/routes/admin/+page.svelte": {
     "file": "entries/pages/admin/_page.svelte.js",
@@ -183,6 +212,12 @@
       "_root.js",
       "_state.svelte.js"
     ]
+  },
+  "src/routes/admin/export/+server.ts": {
+    "file": "entries/endpoints/admin/export/_server.ts.js",
+    "name": "entries/endpoints/admin/export/_server.ts",
+    "src": "src/routes/admin/export/+server.ts",
+    "isEntry": true
   },
   "src/routes/admin/login/+page.server.ts": {
     "file": "entries/pages/admin/login/_page.server.ts.js",
@@ -207,7 +242,10 @@
     "file": "entries/pages/glasanje/_page.server.ts.js",
     "name": "entries/pages/glasanje/_page.server.ts",
     "src": "src/routes/glasanje/+page.server.ts",
-    "isEntry": true
+    "isEntry": true,
+    "imports": [
+      "_config.js"
+    ]
   },
   "src/routes/glasanje/+page.svelte": {
     "file": "entries/pages/glasanje/_page.svelte.js",
@@ -219,7 +257,8 @@
       "_exports.js",
       "_utils2.js",
       "_root.js",
-      "_state.svelte.js"
+      "_state.svelte.js",
+      "_index3.js"
     ]
   },
   "src/routes/price/+page.server.ts": {
@@ -238,7 +277,8 @@
       "_exports.js",
       "_utils2.js",
       "_root.js",
-      "_state.svelte.js"
+      "_state.svelte.js",
+      "_index3.js"
     ]
   },
   "virtual:__sveltekit/env": {
