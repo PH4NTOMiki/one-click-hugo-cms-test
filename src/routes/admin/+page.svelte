@@ -294,20 +294,31 @@
 		{/if}
 
 		<!-- CONTENT (TEXTS) TAB -->
-		{#if tab === 'content'}
-			{#if form?.savedContent}
-				<div class="mt-6 rounded-xl border border-primary/30 bg-primary/10 px-4 py-3 text-sm text-primary">
-					Tekstovi su spremljeni. Promjene će se pojaviti na stranici nakon sljedeće objave (redeploy).
-				</div>
-			{/if}
+			{#if tab === 'content'}
+				{#if form?.savedContent}
+					<div class="mt-6 rounded-xl border border-primary/30 bg-primary/10 px-4 py-3 text-sm text-primary">
+						Tekstovi su spremljeni. Kliknite „Objavi promjene” kako bi postali vidljivi posjetiteljima.
+					</div>
+				{/if}
+				{#if form?.published}
+					<div class="mt-6 rounded-xl border border-green-500/30 bg-green-500/10 px-4 py-3 text-sm text-green-700">
+						Objava je pokrenuta. Nove izmjene bit će vidljive za nekoliko minuta, kada Vercel dovrši objavu.
+					</div>
+				{/if}
+				{#if form?.publishError}
+					<div class="mt-6 rounded-xl border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive">
+						{form.publishError}
+					</div>
+				{/if}
 
-			<div class="mt-6 flex items-start gap-3 rounded-xl border border-border bg-muted px-4 py-3 text-sm text-muted-foreground">
-				<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mt-0.5 shrink-0"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
-				<p>
-					Ovdje uređujete tekstove i natpise na gumbima. Nakon što spremite, potrebno je
-					<strong class="text-foreground">ponovno objaviti stranicu</strong> (u Vercelu kliknite „Redeploy”, ili se to dogodi automatski kod nove objave) kako bi izmjene postale vidljive posjetiteljima.
-				</p>
-			</div>
+				<div class="mt-6 flex items-start gap-3 rounded-xl border border-border bg-muted px-4 py-3 text-sm text-muted-foreground">
+					<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mt-0.5 shrink-0"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+					<p>
+						Ovdje uređujete tekstove i natpise na gumbima. Prvo <strong class="text-foreground">spremite</strong> izmjene,
+						a zatim kliknite <strong class="text-foreground">„Objavi promjene”</strong> kako bi postale vidljive posjetiteljima.
+						Objava traje nekoliko minuta.
+					</p>
+				</div>
 
 			<form method="POST" action="?/saveContent" use:enhance class="mt-6 grid gap-8">
 				{#each contentByGroup as [group, fields] (group)}
@@ -331,14 +342,35 @@
 					</section>
 				{/each}
 
-				<div class="sticky bottom-4 flex items-center gap-3 rounded-xl border border-border bg-card/95 p-3 backdrop-blur">
-					<button class="inline-flex items-center gap-2 rounded-lg bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90">
-						<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
-						Spremi tekstove
+					<div class="sticky bottom-4 flex flex-wrap items-center gap-3 rounded-xl border border-border bg-card/95 p-3 backdrop-blur">
+						<button class="inline-flex items-center gap-2 rounded-lg bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90">
+							<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+							1. Spremi tekstove
+						</button>
+						<span class="text-xs text-muted-foreground">Zatim objavite promjene &rarr;</span>
+					</div>
+				</form>
+
+				<!-- Publish (separate form so it doesn't submit the text fields) -->
+				<form
+					method="POST"
+					action="?/publish"
+					use:enhance
+					class="mt-3 flex flex-wrap items-center gap-3"
+				>
+					<button
+						disabled={!data.publishConfigured}
+						class="inline-flex items-center gap-2 rounded-lg bg-accent px-5 py-2.5 text-sm font-semibold text-accent-foreground transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
+					>
+						<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m22 2-11 11"/><path d="M22 2 15 22l-4-9-9-4Z"/></svg>
+						2. Objavi promjene
 					</button>
-					<span class="text-xs text-muted-foreground">Vidljivo nakon ponovne objave stranice.</span>
-				</div>
-			</form>
-		{/if}
+					{#if data.publishConfigured}
+						<span class="text-xs text-muted-foreground">Pokreće novu objavu stranice na Vercelu.</span>
+					{:else}
+						<span class="text-xs text-muted-foreground">Objava nije podešena — dodajte VERCEL_DEPLOY_HOOK_URL u postavkama projekta.</span>
+					{/if}
+				</form>
+			{/if}
 	</main>
 </div>

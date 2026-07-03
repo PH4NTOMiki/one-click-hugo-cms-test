@@ -1,5 +1,6 @@
 // @ts-nocheck
 import { fail, redirect } from '@sveltejs/kit';
+import { env } from '$env/dynamic/private';
 import type { Actions, PageServerLoad } from './$types';
 import { contentFields, defaultContent } from '$lib/content/defaults';
 
@@ -29,7 +30,13 @@ export const load = async ({ locals }: Parameters<PageServerLoad>[0]) => {
 		if (row.key in content && typeof row.value === 'string') content[row.key] = row.value;
 	}
 
-	return { nominees: nomineeList, stories: stories ?? [], content, contentFields };
+	return {
+		nominees: nomineeList,
+		stories: stories ?? [],
+		content,
+		contentFields,
+		publishConfigured: Boolean(env.VERCEL_DEPLOY_HOOK_URL)
+	};
 };
 
 export const actions = {
@@ -49,6 +56,22 @@ export const actions = {
 		const { error } = await locals.supabase.from('site_content').upsert(rows, { onConflict: 'key' });
 		if (error) return fail(500, { error: 'Spremanje tekstova nije uspjelo.' });
 		return { success: true, savedContent: true };
+	},
+
+	publish: async () => {
+		const hook = env.VERCEL_DEPLOY_HOOK_URL;
+		if (!hook) {
+			return fail(400, {
+				publishError: 'Objava nije podešena. Dodajte VERCEL_DEPLOY_HOOK_URL u postavkama projekta.'
+			});
+		}
+		try {
+			const res = await fetch(hook, { method: 'POST' });
+			if (!res.ok) return fail(502, { publishError: 'Pokretanje objave nije uspjelo.' });
+		} catch {
+			return fail(502, { publishError: 'Pokretanje objave nije uspjelo.' });
+		}
+		return { success: true, published: true };
 	},
 
 	updateNominee: async ({ request, locals }: import('./$types').RequestEvent) => {

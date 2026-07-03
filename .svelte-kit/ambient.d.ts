@@ -38,56 +38,55 @@
  * The above values will be the same _even if_ different values for `ENVIRONMENT` or `PUBLIC_BASE_URL` are set at runtime, as they are statically replaced in your code with their build time values.
  */
 declare module '$env/static/private' {
-	export const NODE_ENV: string;
-	export const GRPC_DEFAULT_SSL_ROOTS_FILE_PATH: string;
-	export const NODE_PATH: string;
-	export const npm_config_user_agent: string;
-	export const SUPABASE_SECRET_KEY: string;
-	export const POSTGRES_USER: string;
-	export const SUPABASE_ANON_KEY: string;
-	export const OLDPWD: string;
-	export const CURL_CA_BUNDLE: string;
-	export const __VITE_ADDITIONAL_SERVER_ALLOWED_HOSTS: string;
-	export const VERCEL_OIDC_TOKEN: string;
-	export const __NEXT_NODE_NATIVE_TS_LOADER_ENABLED: string;
-	export const V0_CODE_SERVER_CALLBACK_TOKEN: string;
-	export const PWD: string;
-	export const SUPABASE_JWT_SECRET: string;
-	export const NPM_CONFIG_CAFILE: string;
-	export const V0_CODE_SERVER_CALLBACK_URL: string;
-	export const PNPM_PACKAGE_NAME: string;
-	export const SHLVL: string;
-	export const SUPABASE_PUBLISHABLE_KEY: string;
-	export const NODE_OPTIONS: string;
-	export const REQUESTS_CA_BUNDLE: string;
-	export const SSL_CERT_FILE: string;
-	export const POSTGRES_PRISMA_URL: string;
-	export const POSTGRES_PASSWORD: string;
-	export const npm_config_verify_deps_before_run: string;
-	export const POSTGRES_HOST: string;
-	export const SVELTEKIT_FORK: string;
-	export const PATH: string;
-	export const DEV_PORT: string;
-	export const npm_command: string;
-	export const V0_RUNTIME_URL: string;
-	export const POSTGRES_URL_NON_POOLING: string;
-	export const AWS_CA_BUNDLE: string;
-	export const TURBO_UI: string;
-	export const NODE_EXTRA_CA_CERTS: string;
 	export const AI_GATEWAY_API_KEY: string;
-	export const SUPABASE_SERVICE_ROLE_KEY: string;
-	export const TURBO_ENV_MODE: string;
-	export const CARGO_HTTP_CAINFO: string;
-	export const POSTGRES_DATABASE: string;
-	export const HOME: string;
-	export const PIP_CERT: string;
-	export const NODE_USE_SYSTEM_CA: string;
+	export const SUPABASE_SECRET_KEY: string;
+	export const SUPABASE_ANON_KEY: string;
+	export const POSTGRES_PASSWORD: string;
+	export const POSTGRES_PRISMA_URL: string;
 	export const SUPABASE_URL: string;
-	export const V0_CALLBACK_URL: string;
-	export const VERCEL_WEB_ANALYTICS_ID: string;
+	export const POSTGRES_URL_NON_POOLING: string;
+	export const POSTGRES_USER: string;
+	export const POSTGRES_DATABASE: string;
+	export const SUPABASE_SERVICE_ROLE_KEY: string;
+	export const SUPABASE_JWT_SECRET: string;
 	export const POSTGRES_URL: string;
+	export const POSTGRES_HOST: string;
+	export const SUPABASE_PUBLISHABLE_KEY: string;
+	export const VERCEL_WEB_ANALYTICS_ID: string;
+	export const VERCEL_OIDC_TOKEN: string;
+	export const V0_RUNTIME_URL: string;
+	export const V0_CALLBACK_URL: string;
+	export const npm_command: string;
+	export const NODE_OPTIONS: string;
+	export const NODE_EXTRA_CA_CERTS: string;
+	export const npm_config_verify_deps_before_run: string;
+	export const TURBO_ENV_MODE: string;
+	export const PWD: string;
+	export const NPM_CONFIG_CAFILE: string;
+	export const HOME: string;
 	export const GIT_SSL_CAINFO: string;
+	export const CARGO_HTTP_CAINFO: string;
+	export const V0_CODE_SERVER_CALLBACK_URL: string;
+	export const DEV_PORT: string;
 	export const pnpm_config_verify_deps_before_run: string;
+	export const V0_CODE_SERVER_CALLBACK_TOKEN: string;
+	export const __VITE_ADDITIONAL_SERVER_ALLOWED_HOSTS: string;
+	export const TURBO_UI: string;
+	export const CURL_CA_BUNDLE: string;
+	export const SHLVL: string;
+	export const npm_config_user_agent: string;
+	export const PNPM_PACKAGE_NAME: string;
+	export const SSL_CERT_FILE: string;
+	export const NODE_PATH: string;
+	export const PIP_CERT: string;
+	export const REQUESTS_CA_BUNDLE: string;
+	export const NODE_USE_SYSTEM_CA: string;
+	export const AWS_CA_BUNDLE: string;
+	export const PATH: string;
+	export const GRPC_DEFAULT_SSL_ROOTS_FILE_PATH: string;
+	export const OLDPWD: string;
+	export const __NEXT_NODE_NATIVE_TS_LOADER_ENABLED: string;
+	export const NODE_ENV: string;
 }
 
 /**
@@ -124,10 +123,10 @@ declare module '$env/static/private' {
  * The above values will be the same _even if_ different values for `ENVIRONMENT` or `PUBLIC_BASE_URL` are set at runtime, as they are statically replaced in your code with their build time values.
  */
 declare module '$env/static/public' {
-	export const NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: string;
-	export const NEXT_PUBLIC_DEV_SUPABASE_REDIRECT_URL: string;
 	export const NEXT_PUBLIC_SUPABASE_URL: string;
 	export const NEXT_PUBLIC_SUPABASE_ANON_KEY: string;
+	export const NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: string;
+	export const NEXT_PUBLIC_DEV_SUPABASE_REDIRECT_URL: string;
 }
 
 /**
@@ -177,56 +176,55 @@ declare module '$env/static/public' {
  */
 declare module '$env/dynamic/private' {
 	export const env: {
-		NODE_ENV: string;
-		GRPC_DEFAULT_SSL_ROOTS_FILE_PATH: string;
-		NODE_PATH: string;
-		npm_config_user_agent: string;
-		SUPABASE_SECRET_KEY: string;
-		POSTGRES_USER: string;
-		SUPABASE_ANON_KEY: string;
-		OLDPWD: string;
-		CURL_CA_BUNDLE: string;
-		__VITE_ADDITIONAL_SERVER_ALLOWED_HOSTS: string;
-		VERCEL_OIDC_TOKEN: string;
-		__NEXT_NODE_NATIVE_TS_LOADER_ENABLED: string;
-		V0_CODE_SERVER_CALLBACK_TOKEN: string;
-		PWD: string;
-		SUPABASE_JWT_SECRET: string;
-		NPM_CONFIG_CAFILE: string;
-		V0_CODE_SERVER_CALLBACK_URL: string;
-		PNPM_PACKAGE_NAME: string;
-		SHLVL: string;
-		SUPABASE_PUBLISHABLE_KEY: string;
-		NODE_OPTIONS: string;
-		REQUESTS_CA_BUNDLE: string;
-		SSL_CERT_FILE: string;
-		POSTGRES_PRISMA_URL: string;
-		POSTGRES_PASSWORD: string;
-		npm_config_verify_deps_before_run: string;
-		POSTGRES_HOST: string;
-		SVELTEKIT_FORK: string;
-		PATH: string;
-		DEV_PORT: string;
-		npm_command: string;
-		V0_RUNTIME_URL: string;
-		POSTGRES_URL_NON_POOLING: string;
-		AWS_CA_BUNDLE: string;
-		TURBO_UI: string;
-		NODE_EXTRA_CA_CERTS: string;
 		AI_GATEWAY_API_KEY: string;
-		SUPABASE_SERVICE_ROLE_KEY: string;
-		TURBO_ENV_MODE: string;
-		CARGO_HTTP_CAINFO: string;
-		POSTGRES_DATABASE: string;
-		HOME: string;
-		PIP_CERT: string;
-		NODE_USE_SYSTEM_CA: string;
+		SUPABASE_SECRET_KEY: string;
+		SUPABASE_ANON_KEY: string;
+		POSTGRES_PASSWORD: string;
+		POSTGRES_PRISMA_URL: string;
 		SUPABASE_URL: string;
-		V0_CALLBACK_URL: string;
-		VERCEL_WEB_ANALYTICS_ID: string;
+		POSTGRES_URL_NON_POOLING: string;
+		POSTGRES_USER: string;
+		POSTGRES_DATABASE: string;
+		SUPABASE_SERVICE_ROLE_KEY: string;
+		SUPABASE_JWT_SECRET: string;
 		POSTGRES_URL: string;
+		POSTGRES_HOST: string;
+		SUPABASE_PUBLISHABLE_KEY: string;
+		VERCEL_WEB_ANALYTICS_ID: string;
+		VERCEL_OIDC_TOKEN: string;
+		V0_RUNTIME_URL: string;
+		V0_CALLBACK_URL: string;
+		npm_command: string;
+		NODE_OPTIONS: string;
+		NODE_EXTRA_CA_CERTS: string;
+		npm_config_verify_deps_before_run: string;
+		TURBO_ENV_MODE: string;
+		PWD: string;
+		NPM_CONFIG_CAFILE: string;
+		HOME: string;
 		GIT_SSL_CAINFO: string;
+		CARGO_HTTP_CAINFO: string;
+		V0_CODE_SERVER_CALLBACK_URL: string;
+		DEV_PORT: string;
 		pnpm_config_verify_deps_before_run: string;
+		V0_CODE_SERVER_CALLBACK_TOKEN: string;
+		__VITE_ADDITIONAL_SERVER_ALLOWED_HOSTS: string;
+		TURBO_UI: string;
+		CURL_CA_BUNDLE: string;
+		SHLVL: string;
+		npm_config_user_agent: string;
+		PNPM_PACKAGE_NAME: string;
+		SSL_CERT_FILE: string;
+		NODE_PATH: string;
+		PIP_CERT: string;
+		REQUESTS_CA_BUNDLE: string;
+		NODE_USE_SYSTEM_CA: string;
+		AWS_CA_BUNDLE: string;
+		PATH: string;
+		GRPC_DEFAULT_SSL_ROOTS_FILE_PATH: string;
+		OLDPWD: string;
+		__NEXT_NODE_NATIVE_TS_LOADER_ENABLED: string;
+		NODE_ENV: string;
 		[key: `NEXT_PUBLIC_${string}`]: undefined;
 		[key: `${string}`]: string | undefined;
 	}
@@ -282,10 +280,10 @@ declare module '$env/dynamic/private' {
  */
 declare module '$env/dynamic/public' {
 	export const env: {
-		NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: string;
-		NEXT_PUBLIC_DEV_SUPABASE_REDIRECT_URL: string;
 		NEXT_PUBLIC_SUPABASE_URL: string;
 		NEXT_PUBLIC_SUPABASE_ANON_KEY: string;
+		NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: string;
+		NEXT_PUBLIC_DEV_SUPABASE_REDIRECT_URL: string;
 		[key: `NEXT_PUBLIC_${string}`]: string | undefined;
 	}
 }
