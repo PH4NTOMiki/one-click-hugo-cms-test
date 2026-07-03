@@ -29,7 +29,7 @@ declare module "$app/types" {
 	type MatcherParam<M> = M extends (param : string) => param is (infer U extends string) ? U : string;
 
 	export interface AppTypes {
-		RouteId(): "/" | "/admin" | "/admin/export" | "/admin/login" | "/glasanje" | "/price";
+		RouteId(): "/" | "/admin" | "/admin/export" | "/admin/import" | "/admin/login" | "/glasanje" | "/price";
 		RouteParams(): {
 			
 		};
@@ -37,11 +37,12 @@ declare module "$app/types" {
 			"/": Record<string, never>;
 			"/admin": Record<string, never>;
 			"/admin/export": Record<string, never>;
+			"/admin/import": Record<string, never>;
 			"/admin/login": Record<string, never>;
 			"/glasanje": Record<string, never>;
 			"/price": Record<string, never>
 		};
-		Pathname(): "/" | "/admin" | "/admin/export" | "/admin/login" | "/glasanje" | "/price";
+		Pathname(): "/" | "/admin" | "/admin/export" | "/admin/import" | "/admin/login" | "/glasanje" | "/price";
 		ResolvedPathname(): `${"" | `/${string}`}${ReturnType<AppTypes['Pathname']>}`;
 		Asset(): "/favicon.svg" | "/najsestra-logo.jpeg" | "/najsestra-mark.jpeg" | "/nurse-hero.png" | "/nurse.jpeg" | string & {};
 	}
