@@ -36,7 +36,7 @@
 		</div>
 		<div class="order-1 overflow-hidden rounded-2xl md:order-2 md:rounded-3xl">
 			<img
-				src="/nurse-hero.png"
+				src="/nurse.jpeg"
 				alt="Nasmiješena medicinska sestra u plavoj uniformi prekriženih ruku"
 				class="h-44 w-full object-cover object-top sm:h-56 md:h-72 lg:h-80"
 				width="640"

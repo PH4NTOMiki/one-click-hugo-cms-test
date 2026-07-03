@@ -13,15 +13,8 @@
 	{#if !isAdmin}
 		<header class="sticky top-0 z-20 border-b border-border bg-card/95 backdrop-blur">
 			<div class="mx-auto flex max-w-5xl items-center justify-between px-4 py-3">
-				<a href="/" class="flex items-center gap-2" onclick={() => (menuOpen = false)}>
-					<span class="relative flex h-9 w-9 items-center justify-center">
-						<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="var(--color-accent)" aria-hidden="true"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.29 1.51 4.04 3 5.5l7 7Z"/></svg>
-						<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="var(--color-primary)" aria-hidden="true" class="absolute -right-0.5 -top-0.5"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.29 1.51 4.04 3 5.5l7 7Z"/></svg>
-					</span>
-					<span class="leading-none">
-						<span class="block text-sm font-semibold text-primary">najMedicinska</span>
-						<span class="block text-lg font-extrabold tracking-tight" style="font-family: var(--font-display)">SESTRA</span>
-					</span>
+				<a href="/" class="flex items-center" onclick={() => (menuOpen = false)}>
+					<img src="/najsestra-logo.jpeg" alt="Naj SESTRA — znanje, podrška, ljudskost" class="h-11 w-auto md:h-12" width="180" height="120" />
 				</a>
 
 				<nav class="hidden items-center gap-2 sm:flex">
