@@ -39,21 +39,6 @@
  */
 declare module '$env/static/private' {
 	export const AI_GATEWAY_API_KEY: string;
-	export const SUPABASE_JWT_SECRET: string;
-	export const POSTGRES_HOST: string;
-	export const POSTGRES_URL: string;
-	export const SUPABASE_ANON_KEY: string;
-	export const SUPABASE_PUBLISHABLE_KEY: string;
-	export const POSTGRES_PRISMA_URL: string;
-	export const SUPABASE_SERVICE_ROLE_KEY: string;
-	export const SUPABASE_URL: string;
-	export const POSTGRES_USER: string;
-	export const POSTGRES_DATABASE: string;
-	export const POSTGRES_URL_NON_POOLING: string;
-	export const POSTGRES_PASSWORD: string;
-	export const SUPABASE_SECRET_KEY: string;
-	export const VERCEL_WEB_ANALYTICS_ID: string;
-	export const VERCEL_OIDC_TOKEN: string;
 	export const V0_RUNTIME_URL: string;
 	export const V0_CALLBACK_URL: string;
 	export const npm_command: string;
@@ -95,7 +80,6 @@ declare module '$env/static/private' {
 	export const instance_var: string;
 	export const pmx: string;
 	export const INIT_CWD: string;
-	export const __NEXT_NODE_NATIVE_TS_LOADER_ENABLED: string;
 	export const npm_lifecycle_script: string;
 	export const unique_id: string;
 	export const npm_package_name: string;
@@ -144,6 +128,7 @@ declare module '$env/static/private' {
 	export const status: string;
 	export const name: string;
 	export const pm_out_log_path: string;
+	export const __NEXT_NODE_NATIVE_TS_LOADER_ENABLED: string;
 	export const NODE_ENV: string;
 }
 
@@ -181,10 +166,7 @@ declare module '$env/static/private' {
  * The above values will be the same _even if_ different values for `ENVIRONMENT` or `PUBLIC_BASE_URL` are set at runtime, as they are statically replaced in your code with their build time values.
  */
 declare module '$env/static/public' {
-	export const NEXT_PUBLIC_SUPABASE_ANON_KEY: string;
-	export const NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: string;
-	export const NEXT_PUBLIC_SUPABASE_URL: string;
-	export const NEXT_PUBLIC_DEV_SUPABASE_REDIRECT_URL: string;
+	
 }
 
 /**
@@ -235,21 +217,6 @@ declare module '$env/static/public' {
 declare module '$env/dynamic/private' {
 	export const env: {
 		AI_GATEWAY_API_KEY: string;
-		SUPABASE_JWT_SECRET: string;
-		POSTGRES_HOST: string;
-		POSTGRES_URL: string;
-		SUPABASE_ANON_KEY: string;
-		SUPABASE_PUBLISHABLE_KEY: string;
-		POSTGRES_PRISMA_URL: string;
-		SUPABASE_SERVICE_ROLE_KEY: string;
-		SUPABASE_URL: string;
-		POSTGRES_USER: string;
-		POSTGRES_DATABASE: string;
-		POSTGRES_URL_NON_POOLING: string;
-		POSTGRES_PASSWORD: string;
-		SUPABASE_SECRET_KEY: string;
-		VERCEL_WEB_ANALYTICS_ID: string;
-		VERCEL_OIDC_TOKEN: string;
 		V0_RUNTIME_URL: string;
 		V0_CALLBACK_URL: string;
 		npm_command: string;
@@ -291,7 +258,6 @@ declare module '$env/dynamic/private' {
 		instance_var: string;
 		pmx: string;
 		INIT_CWD: string;
-		__NEXT_NODE_NATIVE_TS_LOADER_ENABLED: string;
 		npm_lifecycle_script: string;
 		unique_id: string;
 		npm_package_name: string;
@@ -340,6 +306,7 @@ declare module '$env/dynamic/private' {
 		status: string;
 		name: string;
 		pm_out_log_path: string;
+		__NEXT_NODE_NATIVE_TS_LOADER_ENABLED: string;
 		NODE_ENV: string;
 		[key: `NEXT_PUBLIC_${string}`]: undefined;
 		[key: `${string}`]: string | undefined;
@@ -396,10 +363,6 @@ declare module '$env/dynamic/private' {
  */
 declare module '$env/dynamic/public' {
 	export const env: {
-		NEXT_PUBLIC_SUPABASE_ANON_KEY: string;
-		NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: string;
-		NEXT_PUBLIC_SUPABASE_URL: string;
-		NEXT_PUBLIC_DEV_SUPABASE_REDIRECT_URL: string;
 		[key: `NEXT_PUBLIC_${string}`]: string | undefined;
 	}
 }
