@@ -13,8 +13,12 @@
 	{#if !isAdmin}
 		<header class="sticky top-0 z-20 border-b border-border bg-card/95 backdrop-blur">
 			<div class="mx-auto flex max-w-5xl items-center justify-between px-4 py-3">
-				<a href="/" class="flex items-center" onclick={() => (menuOpen = false)}>
-					<img src="/najsestra-logo.jpeg" alt="Naj SESTRA — znanje, podrška, ljudskost" class="h-11 w-auto md:h-12" width="180" height="120" />
+				<a href="/" class="flex items-center gap-2.5" onclick={() => (menuOpen = false)}>
+					<img src="/najsestra-mark.jpeg" alt="" class="h-11 w-11 md:h-12 md:w-12 object-contain" width="48" height="48" />
+					<span class="leading-none">
+						<span class="block text-sm font-semibold text-primary">Naj</span>
+						<span class="block text-lg font-extrabold tracking-tight text-foreground" style="font-family: var(--font-display)">SESTRA</span>
+					</span>
 				</a>
 
 				<nav class="hidden items-center gap-2 sm:flex">
