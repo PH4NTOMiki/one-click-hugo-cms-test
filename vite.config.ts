@@ -1,10 +1,31 @@
 import { sveltekit } from '@sveltejs/kit/vite';
 import { defineConfig, loadEnv, type Plugin } from 'vite';
 import tailwindcss from '@tailwindcss/vite';
-import { writeFileSync } from 'node:fs';
+import { writeFileSync, readFileSync, existsSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { createClient } from '@supabase/supabase-js';
 import { defaultContent } from './src/lib/content/defaults';
+
+/** Read env vars from the v0 shared env file so the Vite plugin can reach Supabase at dev-server start. */
+function loadSharedEnv(): Record<string, string> {
+	const sharedPath = '/vercel/share/.env.project';
+	if (!existsSync(sharedPath)) return {};
+	const result: Record<string, string> = {};
+	const lines = readFileSync(sharedPath, 'utf-8').split('\n');
+	for (const line of lines) {
+		const trimmed = line.trim();
+		if (!trimmed || trimmed.startsWith('#')) continue;
+		const eqIdx = trimmed.indexOf('=');
+		if (eqIdx < 0) continue;
+		const key = trimmed.slice(0, eqIdx).trim();
+		let val = trimmed.slice(eqIdx + 1).trim();
+		if ((val.startsWith("'") && val.endsWith("'")) || (val.startsWith('"') && val.endsWith('"'))) {
+			val = val.slice(1, -1);
+		}
+		result[key] = val;
+	}
+	return result;
+}
 
 // Runs at build start (every `vite build`, i.e. every Vercel deploy/redeploy)
 // and on dev-server start. It reads the editable strings from the Supabase
@@ -49,7 +70,8 @@ function contentPlugin(env: Record<string, string>): Plugin {
 
 export default defineConfig(({ mode }) => {
 	// Load every env var (no prefix filter) so we can reach Supabase at build time.
-	const env = loadEnv(mode, process.cwd(), '');
+	// Merge with the shared v0 env file so the Vite plugin can reach Supabase at dev-server start.
+	const env = { ...loadSharedEnv(), ...loadEnv(mode, process.cwd(), '') };
 	return {
 		plugins: [contentPlugin(env), tailwindcss(), sveltekit()],
 		server: {
