@@ -16,10 +16,9 @@
 			<div class="mx-auto flex max-w-5xl items-center justify-between px-4 py-3">
 				<a href="/" class="flex items-center gap-2.5" onclick={() => (menuOpen = false)}>
 					<img src="/najsestra-mark.jpeg" alt="" class="h-11 w-11 md:h-12 md:w-12 object-contain" width="48" height="48" />
-					<span class="leading-tight">
-						<span class="block text-sm font-semibold text-primary">Naj</span>
-						<span class="block text-lg font-extrabold tracking-tight text-foreground" style="font-family: var(--font-display)">SESTRA</span>
-						<span class="block text-[10px] font-medium tracking-wide text-muted-foreground uppercase">u dijabetesu</span>
+					<span class="leading-none">
+						<span class="block text-xl font-extrabold tracking-tight text-foreground" style="font-family: var(--font-display)">NajSESTRA</span>
+						<span class="block text-sm font-semibold tracking-wide text-primary mt-0.5">u dijabetesu</span>
 					</span>
 				</a>
 
