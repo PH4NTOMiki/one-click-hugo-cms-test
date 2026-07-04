@@ -4,6 +4,18 @@
 
 	let { data, form }: { data: PageData; form: ActionData } = $props();
 
+	// Local copy of content so inputs never flash empty during the brief
+	// re-invalidation window that use:enhance triggers after a save.
+	let localContent: Record<string, string> = $state({ ...data.content });
+
+	// Sync from server whenever data.content changes (e.g. after page load or
+	// navigation), but don't overwrite what the user is currently typing.
+	$effect(() => {
+		for (const key of Object.keys(data.content)) {
+			if (!(key in localContent)) localContent[key] = data.content[key];
+		}
+	});
+
 	const contentByGroup = $derived.by(() => {
 		const groups = new Map<string, typeof data.contentFields>();
 		for (const field of data.contentFields) {
@@ -57,9 +69,11 @@
 						{#if field.multiline}
 							<textarea id={field.key} name={field.key} rows="3"
 								class="resize-y rounded-lg border border-input bg-background px-3 py-2 text-sm outline-none transition-colors focus:border-primary"
-							>{data.content[field.key]}</textarea>
+								bind:value={localContent[field.key]}
+							></textarea>
 						{:else}
-							<input id={field.key} name={field.key} value={data.content[field.key]}
+							<input id={field.key} name={field.key}
+								bind:value={localContent[field.key]}
 								class="rounded-lg border border-input bg-background px-3 py-2 text-sm outline-none transition-colors focus:border-primary" />
 						{/if}
 					</div>
