@@ -2,6 +2,7 @@
 import { fail } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
 import { supabaseAdmin } from '$lib/server/supabaseAdmin';
+import { SCHEMA_DDL } from '$lib/server/db-setup';
 import { POSTGRES_URL_NON_POOLING } from '$env/static/private';
 import pg from 'pg';
 
@@ -67,6 +68,12 @@ export const actions = {
 		const file = formData.get('file');
 		const mode = String(formData.get('mode') ?? 'append'); // append | replace
 
+		// Which sections the user wants to import (all if not specified).
+		const sectionsParam = formData.get('sections');
+		const selectedSections: Set<string> = sectionsParam
+			? new Set(String(sectionsParam).split(',').map((s) => s.trim()).filter(Boolean))
+			: new Set(['nominees', 'votes', 'stories', 'site_content', 'auth']);
+
 		if (!file || typeof file === 'string') {
 			return fail(400, { error: 'Nije odabrana datoteka.' });
 		}
@@ -87,10 +94,12 @@ export const actions = {
 		const errors: string[] = [];
 
 		// ------------------------------------------------------------------
-		// Schema mode: run the DDL first so all tables exist before upsert
+		// Schema mode: run the DDL first so all tables exist before upsert.
+		// Falls back to the bundled SCHEMA_DDL if the file has none.
 		// ------------------------------------------------------------------
-		if (bundle.format === 'schema+data' && bundle.schema_ddl) {
-			const { error: ddlErr } = await runDDL(bundle.schema_ddl);
+		if (bundle.format === 'schema+data') {
+			const ddl = bundle.schema_ddl ?? SCHEMA_DDL;
+			const { error: ddlErr } = await runDDL(ddl);
 			if (ddlErr) {
 				return fail(500, { error: `Greška pri postavljanju sheme:\n${ddlErr}` });
 			}
@@ -98,20 +107,23 @@ export const actions = {
 		}
 
 		// ------------------------------------------------------------------
-		// Replace mode: delete existing rows first (order matters for FKs)
+		// Replace mode: delete only selected sections (order matters for FKs)
 		// ------------------------------------------------------------------
 		if (mode === 'replace') {
-			// votes first (FK to nominees), then nominees
-			await supabaseAdmin.from('votes').delete().neq('id', '00000000-0000-0000-0000-000000000000');
-			await supabaseAdmin.from('nominees').delete().neq('id', '00000000-0000-0000-0000-000000000000');
-			await supabaseAdmin.from('stories').delete().neq('id', '00000000-0000-0000-0000-000000000000');
-			await supabaseAdmin.from('site_content').delete().neq('key', '__never__');
+			if (selectedSections.has('votes'))
+				await supabaseAdmin.from('votes').delete().neq('id', '00000000-0000-0000-0000-000000000000');
+			if (selectedSections.has('nominees'))
+				await supabaseAdmin.from('nominees').delete().neq('id', '00000000-0000-0000-0000-000000000000');
+			if (selectedSections.has('stories'))
+				await supabaseAdmin.from('stories').delete().neq('id', '00000000-0000-0000-0000-000000000000');
+			if (selectedSections.has('site_content'))
+				await supabaseAdmin.from('site_content').delete().neq('key', '__never__');
 		}
 
 		// ------------------------------------------------------------------
 		// nominees
 		// ------------------------------------------------------------------
-		if (tables.nominees?.length) {
+		if (selectedSections.has('nominees') && tables.nominees?.length) {
 			const { error: err, count } = await supabaseAdmin
 				.from('nominees')
 				.upsert(tables.nominees as never[], { onConflict: 'id', count: 'exact' });
@@ -122,7 +134,7 @@ export const actions = {
 		// ------------------------------------------------------------------
 		// votes (nominees must exist first because of the FK)
 		// ------------------------------------------------------------------
-		if (tables.votes?.length) {
+		if (selectedSections.has('votes') && tables.votes?.length) {
 			const { error: err, count } = await supabaseAdmin
 				.from('votes')
 				.upsert(tables.votes as never[], { onConflict: 'id', count: 'exact' });
@@ -133,7 +145,7 @@ export const actions = {
 		// ------------------------------------------------------------------
 		// stories
 		// ------------------------------------------------------------------
-		if (tables.stories?.length) {
+		if (selectedSections.has('stories') && tables.stories?.length) {
 			const { error: err, count } = await supabaseAdmin
 				.from('stories')
 				.upsert(tables.stories as never[], { onConflict: 'id', count: 'exact' });
@@ -144,7 +156,7 @@ export const actions = {
 		// ------------------------------------------------------------------
 		// site_content
 		// ------------------------------------------------------------------
-		if (tables.site_content?.length) {
+		if (selectedSections.has('site_content') && tables.site_content?.length) {
 			const { error: err, count } = await supabaseAdmin
 				.from('site_content')
 				.upsert(tables.site_content as never[], { onConflict: 'key', count: 'exact' });
@@ -155,12 +167,11 @@ export const actions = {
 		// ------------------------------------------------------------------
 		// auth users — recreate with admin API (password reset required after)
 		// ------------------------------------------------------------------
-		if (bundle.auth?.users?.length) {
+		if (selectedSections.has('auth') && bundle.auth?.users?.length) {
 			let created = 0;
+			const { data: existing } = await supabaseAdmin.auth.admin.listUsers({ perPage: 1000 });
 			for (const u of bundle.auth.users) {
 				if (!u.email) continue;
-				// Check if user already exists by email.
-				const { data: existing } = await supabaseAdmin.auth.admin.listUsers({ perPage: 1000 });
 				const alreadyExists = existing?.users?.some((eu) => eu.email === u.email);
 				if (alreadyExists) { created++; continue; }
 				const { error: err } = await supabaseAdmin.auth.admin.createUser({

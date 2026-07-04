@@ -1,6 +1,7 @@
 import { error, redirect } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { supabaseAdmin } from '$lib/server/supabaseAdmin';
+import { SCHEMA_DDL, DB_VERSION } from '$lib/server/db-setup';
 
 // ---------------------------------------------------------------------------
 // CSV helpers
@@ -27,111 +28,9 @@ function fmtDate(value: string | null): string {
 	return new Date(value).toLocaleString('hr-HR');
 }
 
-// ---------------------------------------------------------------------------
-// Schema DDL (matches the migration applied in the DB setup)
-// ---------------------------------------------------------------------------
-const SCHEMA_DDL = `-- ============================================================
--- NajSestra — Full schema export
--- Generated: {timestamp}
--- ============================================================
-
--- nominees
-CREATE TABLE IF NOT EXISTS public.nominees (
-  id          uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  name        text NOT NULL,
-  first_name  text,
-  last_name   text,
-  workplace   text,
-  city        text,
-  approved    boolean NOT NULL DEFAULT false,
-  is_winner   boolean NOT NULL DEFAULT false,
-  created_at  timestamptz NOT NULL DEFAULT now()
-);
-
--- votes
-CREATE TABLE IF NOT EXISTS public.votes (
-  id          uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  nominee_id  uuid NOT NULL REFERENCES public.nominees(id) ON DELETE CASCADE,
-  voter_id    text NOT NULL,
-  created_at  timestamptz NOT NULL DEFAULT now(),
-  UNIQUE(voter_id)
-);
-
--- stories
-CREATE TABLE IF NOT EXISTS public.stories (
-  id           uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  nurse_name   text NOT NULL,
-  first_name   text,
-  last_name    text,
-  workplace    text,
-  city         text,
-  author_name  text,
-  author_email text,
-  message      text NOT NULL,
-  status       text NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'approved', 'rejected')),
-  is_winner    boolean NOT NULL DEFAULT false,
-  created_at   timestamptz NOT NULL DEFAULT now()
-);
-
--- site_content
-CREATE TABLE IF NOT EXISTS public.site_content (
-  key        text PRIMARY KEY,
-  value      text NOT NULL,
-  updated_at timestamptz NOT NULL DEFAULT now()
-);
-
--- Indexes
-CREATE INDEX IF NOT EXISTS nominees_approved_idx ON public.nominees(approved);
-CREATE INDEX IF NOT EXISTS nominees_is_winner_idx ON public.nominees(is_winner);
-CREATE INDEX IF NOT EXISTS votes_nominee_id_idx   ON public.votes(nominee_id);
-CREATE INDEX IF NOT EXISTS votes_voter_id_idx     ON public.votes(voter_id);
-CREATE INDEX IF NOT EXISTS stories_status_idx     ON public.stories(status);
-CREATE INDEX IF NOT EXISTS stories_is_winner_idx  ON public.stories(is_winner);
-
--- RLS: nominees
-ALTER TABLE public.nominees ENABLE ROW LEVEL SECURITY;
-DO $$ BEGIN
-  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='nominees' AND policyname='nominees_public_select') THEN
-    CREATE POLICY "nominees_public_select" ON public.nominees FOR SELECT USING (true);
-  END IF;
-  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='nominees' AND policyname='nominees_auth_all') THEN
-    CREATE POLICY "nominees_auth_all" ON public.nominees FOR ALL TO authenticated USING (true) WITH CHECK (true);
-  END IF;
-END $$;
-
--- RLS: votes
-ALTER TABLE public.votes ENABLE ROW LEVEL SECURITY;
-DO $$ BEGIN
-  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='votes' AND policyname='votes_public_insert') THEN
-    CREATE POLICY "votes_public_insert" ON public.votes FOR INSERT WITH CHECK (true);
-  END IF;
-  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='votes' AND policyname='votes_auth_select') THEN
-    CREATE POLICY "votes_auth_select" ON public.votes FOR SELECT TO authenticated USING (true);
-  END IF;
-END $$;
-
--- RLS: stories
-ALTER TABLE public.stories ENABLE ROW LEVEL SECURITY;
-DO $$ BEGIN
-  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='stories' AND policyname='stories_public_insert') THEN
-    CREATE POLICY "stories_public_insert" ON public.stories FOR INSERT WITH CHECK (true);
-  END IF;
-  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='stories' AND policyname='stories_auth_all') THEN
-    CREATE POLICY "stories_auth_all" ON public.stories FOR ALL TO authenticated USING (true) WITH CHECK (true);
-  END IF;
-END $$;
-
--- RLS: site_content
-ALTER TABLE public.site_content ENABLE ROW LEVEL SECURITY;
-DO $$ BEGIN
-  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='site_content' AND policyname='site_content_public_select') THEN
-    CREATE POLICY "site_content_public_select" ON public.site_content FOR SELECT USING (true);
-  END IF;
-  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='site_content' AND policyname='site_content_auth_all') THEN
-    CREATE POLICY "site_content_auth_all" ON public.site_content FOR ALL TO authenticated USING (true) WITH CHECK (true);
-  END IF;
-END $$;
-`;
+// All valid JSON-exportable sections.
+const ALL_SECTIONS = ['nominees', 'votes', 'stories', 'site_content', 'auth'] as const;
+type Section = (typeof ALL_SECTIONS)[number];
 
 // ---------------------------------------------------------------------------
 // GET handler
@@ -151,13 +50,34 @@ export const GET: RequestHandler = async ({ url, locals }) => {
 	if (format === 'json' || format === 'schema') {
 		const includeSchema = format === 'schema';
 
-		// Fetch all tables using the service-role admin client to bypass RLS.
+		// Which sections to include — defaults to all if not specified.
+		const tablesParam = url.searchParams.get('tables'); // e.g. "nominees,votes"
+		const selectedSections: Set<Section> = tablesParam
+			? new Set(
+					tablesParam
+						.split(',')
+						.map((s) => s.trim())
+						.filter((s): s is Section => (ALL_SECTIONS as readonly string[]).includes(s))
+				)
+			: new Set(ALL_SECTIONS);
+
+		// Fetch only the requested tables in parallel.
 		const [nomineesRes, votesRes, storiesRes, contentRes, usersRes] = await Promise.all([
-			supabaseAdmin.from('nominees').select('*').order('created_at', { ascending: true }),
-			supabaseAdmin.from('votes').select('*').order('created_at', { ascending: true }),
-			supabaseAdmin.from('stories').select('*').order('created_at', { ascending: true }),
-			supabaseAdmin.from('site_content').select('*'),
-			supabaseAdmin.auth.admin.listUsers({ perPage: 1000 })
+			selectedSections.has('nominees')
+				? supabaseAdmin.from('nominees').select('*').order('created_at', { ascending: true })
+				: Promise.resolve({ data: null }),
+			selectedSections.has('votes')
+				? supabaseAdmin.from('votes').select('*').order('created_at', { ascending: true })
+				: Promise.resolve({ data: null }),
+			selectedSections.has('stories')
+				? supabaseAdmin.from('stories').select('*').order('created_at', { ascending: true })
+				: Promise.resolve({ data: null }),
+			selectedSections.has('site_content')
+				? supabaseAdmin.from('site_content').select('*')
+				: Promise.resolve({ data: null }),
+			selectedSections.has('auth')
+				? supabaseAdmin.auth.admin.listUsers({ perPage: 1000 })
+				: Promise.resolve({ data: null })
 		]);
 
 		// Strip sensitive auth fields before export.
@@ -171,29 +91,38 @@ export const GET: RequestHandler = async ({ url, locals }) => {
 			role: u.role
 		}));
 
+		// Build tables object — only include keys that were requested.
+		const tables: Record<string, unknown> = {};
+		if (selectedSections.has('nominees')) tables.nominees = nomineesRes.data ?? [];
+		if (selectedSections.has('votes')) tables.votes = votesRes.data ?? [];
+		if (selectedSections.has('stories')) tables.stories = storiesRes.data ?? [];
+		if (selectedSections.has('site_content')) tables.site_content = contentRes.data ?? [];
+
 		const bundle: Record<string, unknown> = {
 			exported_at: new Date().toISOString(),
 			format: includeSchema ? 'schema+data' : 'data-only',
-			tables: {
-				nominees: nomineesRes.data ?? [],
-				votes: votesRes.data ?? [],
-				stories: storiesRes.data ?? [],
-				site_content: contentRes.data ?? []
-			},
-			auth: {
-				users: safeUsers
-			}
+			db_version: DB_VERSION,
+			sections: [...selectedSections],
+			tables
 		};
+
+		if (selectedSections.has('auth')) {
+			bundle.auth = { users: safeUsers };
+		}
 
 		if (includeSchema) {
 			bundle.schema_ddl = SCHEMA_DDL.replace('{timestamp}', new Date().toISOString());
 		}
 
 		const suffix = includeSchema ? 'schema-data' : 'data';
+		const sectionSuffix =
+			selectedSections.size < ALL_SECTIONS.length
+				? `-${[...selectedSections].join('-')}`
+				: '';
 		return new Response(JSON.stringify(bundle, null, 2), {
 			headers: {
 				'Content-Type': 'application/json; charset=utf-8',
-				'Content-Disposition': `attachment; filename="najsestra-${suffix}-${stamp}.json"`
+				'Content-Disposition': `attachment; filename="najsestra-${suffix}${sectionSuffix}-${stamp}.json"`
 			}
 		});
 	}

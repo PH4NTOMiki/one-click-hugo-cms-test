@@ -1,3 +1,46 @@
+<script lang="ts">
+	// Section definitions for JSON export selector
+	const SECTIONS = [
+		{ id: 'nominees', label: 'Kandidati' },
+		{ id: 'votes', label: 'Glasovi' },
+		{ id: 'stories', label: 'Priče' },
+		{ id: 'site_content', label: 'Tekstovi' },
+		{ id: 'auth', label: 'Korisnici' }
+	] as const;
+
+	type SectionId = (typeof SECTIONS)[number]['id'];
+
+	let selected = $state<Set<SectionId>>(new Set(SECTIONS.map((s) => s.id)));
+
+	function toggleAll() {
+		if (selected.size === SECTIONS.length) {
+			selected = new Set();
+		} else {
+			selected = new Set(SECTIONS.map((s) => s.id));
+		}
+	}
+
+	function toggle(id: SectionId) {
+		const next = new Set(selected);
+		if (next.has(id)) next.delete(id);
+		else next.add(id);
+		selected = next;
+	}
+
+	function buildUrl(format: 'json' | 'schema') {
+		const params = new URLSearchParams({ format });
+		if (selected.size < SECTIONS.length) {
+			params.set('tables', [...selected].join(','));
+		}
+		return `/admin/export?${params}`;
+	}
+
+	const allChecked = $derived(selected.size === SECTIONS.length);
+	const noneChecked = $derived(selected.size === 0);
+	const exportUrlJson = $derived(buildUrl('json'));
+	const exportUrlSchema = $derived(buildUrl('schema'));
+</script>
+
 <svelte:head>
 	<title>Podaci — Uredništvo</title>
 </svelte:head>
@@ -10,11 +53,42 @@
 	<section class="rounded-xl border border-border bg-card p-6">
 		<h2 class="text-lg font-semibold">Izvoz podataka</h2>
 		<p class="mt-1 text-sm text-muted-foreground leading-relaxed">
-			Preuzmite sve podatke iz baze (kandidati, glasovi, priče, tekstovi, korisnici) u jednoj JSON datoteci.
-			Odaberite format koji vam odgovara.
+			Preuzmite odabrane dijelove baze u JSON datoteci ili kao CSV za Excel.
 		</p>
 
-		<div class="mt-5 grid gap-4 sm:grid-cols-2">
+		<!-- Section selector -->
+		<div class="mt-5 rounded-xl border border-border bg-background p-4">
+			<div class="flex items-center justify-between mb-3">
+				<p class="text-xs font-medium text-muted-foreground">Odaberi što izvesti (JSON)</p>
+				<button
+					type="button"
+					onclick={toggleAll}
+					class="text-xs text-primary hover:underline"
+				>
+					{allChecked ? 'Odznači sve' : 'Označi sve'}
+				</button>
+			</div>
+			<div class="flex flex-wrap gap-2">
+				{#each SECTIONS as section (section.id)}
+					<button
+						type="button"
+						onclick={() => toggle(section.id)}
+						class="inline-flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-xs font-medium transition-colors {selected.has(section.id)
+							? 'border-primary bg-primary/10 text-primary'
+							: 'border-border bg-background text-muted-foreground hover:bg-muted'}"
+					>
+						<span class="flex h-3.5 w-3.5 items-center justify-center rounded-sm border {selected.has(section.id) ? 'border-primary bg-primary' : 'border-muted-foreground'}">
+							{#if selected.has(section.id)}
+								<svg xmlns="http://www.w3.org/2000/svg" width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+							{/if}
+						</span>
+						{section.label}
+					</button>
+				{/each}
+			</div>
+		</div>
+
+		<div class="mt-4 grid gap-4 sm:grid-cols-2">
 			<!-- Data-only export -->
 			<div class="rounded-xl border border-border bg-background p-4">
 				<div class="flex items-center gap-2">
@@ -24,13 +98,14 @@
 					<h3 class="font-semibold text-sm">Samo podaci</h3>
 				</div>
 				<p class="mt-2 text-xs text-muted-foreground leading-relaxed">
-					JSON s redovima iz svih tablica i popisom korisnika. Bez SQL sheme.
+					JSON s redovima iz odabranih tablica. Bez SQL sheme.
 					Koristite za rutinsku sigurnosnu kopiju.
 				</p>
 				<a
-					href="/admin/export?format=json"
+					href={exportUrlJson}
 					download
-					class="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-lg border border-border px-4 py-2.5 text-sm font-medium hover:bg-muted"
+					aria-disabled={noneChecked}
+					class="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-lg border border-border px-4 py-2.5 text-sm font-medium transition-colors {noneChecked ? 'pointer-events-none opacity-40' : 'hover:bg-muted'}"
 				>
 					<svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
 					Preuzmi JSON (podaci)
@@ -46,13 +121,14 @@
 					<h3 class="font-semibold text-sm">Podaci + shema</h3>
 				</div>
 				<p class="mt-2 text-xs text-muted-foreground leading-relaxed">
-					JSON s redovima iz svih tablica, popisom korisnika <strong class="text-foreground">i SQL DDL skriptom</strong> za kreiranje tablica.
+					JSON s redovima iz odabranih tablica <strong class="text-foreground">i SQL DDL skriptom</strong> za kreiranje tablica od nule.
 					Koristite za migraciju na novu bazu.
 				</p>
 				<a
-					href="/admin/export?format=schema"
+					href={exportUrlSchema}
 					download
-					class="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-medium text-primary-foreground hover:opacity-90"
+					aria-disabled={noneChecked}
+					class="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-medium text-primary-foreground transition-opacity {noneChecked ? 'pointer-events-none opacity-40' : 'hover:opacity-90'}"
 				>
 					<svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
 					Preuzmi JSON (podaci + shema)
@@ -84,6 +160,7 @@
 		<p class="mt-1 text-sm text-muted-foreground leading-relaxed">
 			Obnovite podatke iz prethodno izvezene JSON datoteke. Stranica za uvoz je dostupna i bez prijave —
 			koristite je za inicijalno postavljanje nove baze podataka.
+			Datoteka formata <strong class="text-foreground">schema+data</strong> automatski kreira sve tablice na praznoj bazi.
 		</p>
 		<div class="mt-4 flex flex-wrap gap-3">
 			<a

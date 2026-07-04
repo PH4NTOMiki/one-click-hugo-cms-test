@@ -4,14 +4,54 @@
 
 	let { form }: { form: ActionData } = $props();
 
+	const ALL_SECTIONS = [
+		{ id: 'nominees', label: 'Kandidati' },
+		{ id: 'votes', label: 'Glasovi' },
+		{ id: 'stories', label: 'Priče' },
+		{ id: 'site_content', label: 'Tekstovi' },
+		{ id: 'auth', label: 'Korisnici' }
+	] as const;
+
+	type SectionId = (typeof ALL_SECTIONS)[number]['id'];
+
 	let mode = $state<'append' | 'replace'>('append');
 	let fileName = $state<string | null>(null);
 	let dragging = $state(false);
 	let submitting = $state(false);
 
-	function onFileChange(e: Event) {
+	// Sections available in the loaded file (detected on file pick).
+	let availableSections = $state<Set<SectionId>>(new Set(ALL_SECTIONS.map((s) => s.id)));
+	// Sections the user wants to import.
+	let selectedSections = $state<Set<SectionId>>(new Set(ALL_SECTIONS.map((s) => s.id)));
+
+	async function onFileChange(e: Event) {
 		const input = e.target as HTMLInputElement;
-		fileName = input.files?.[0]?.name ?? null;
+		const file = input.files?.[0];
+		if (!file) { fileName = null; return; }
+		fileName = file.name;
+		await detectSections(file);
+	}
+
+	async function detectSections(file: File) {
+		try {
+			const text = await file.text();
+			const parsed = JSON.parse(text);
+			const detected = new Set<SectionId>();
+			const tables: Record<string, unknown> = parsed?.tables ?? {};
+			for (const s of ALL_SECTIONS) {
+				if (s.id === 'auth') {
+					if (Array.isArray(parsed?.auth?.users) && parsed.auth.users.length > 0) detected.add('auth');
+				} else if (Array.isArray(tables[s.id])) {
+					detected.add(s.id);
+				}
+			}
+			availableSections = detected.size > 0 ? detected : new Set(ALL_SECTIONS.map((s) => s.id));
+			// Reset selection to match available sections.
+			selectedSections = new Set(availableSections);
+		} catch {
+			availableSections = new Set(ALL_SECTIONS.map((s) => s.id));
+			selectedSections = new Set(availableSections);
+		}
 	}
 
 	function onDrop(e: DragEvent) {
@@ -20,14 +60,32 @@
 		const file = e.dataTransfer?.files?.[0];
 		if (!file) return;
 		fileName = file.name;
-		// Assign the dropped file to the hidden input so the form picks it up.
 		const input = document.getElementById('file-input') as HTMLInputElement;
 		if (input) {
 			const dt = new DataTransfer();
 			dt.items.add(file);
 			input.files = dt.files;
 		}
+		detectSections(file);
 	}
+
+	function toggleSection(id: SectionId) {
+		const next = new Set(selectedSections);
+		if (next.has(id)) next.delete(id);
+		else next.add(id);
+		selectedSections = next;
+	}
+
+	function toggleAllSections() {
+		if (selectedSections.size === availableSections.size) {
+			selectedSections = new Set();
+		} else {
+			selectedSections = new Set(availableSections);
+		}
+	}
+
+	const allSectionsChecked = $derived(selectedSections.size === availableSections.size);
+	const noneSectionsChecked = $derived(selectedSections.size === 0);
 
 	const summaryEntries = $derived(
 		form && 'summary' in form && form.summary
@@ -71,8 +129,7 @@
 			<h1 class="text-2xl font-semibold">Uvoz podataka</h1>
 			<p class="mt-1.5 text-sm text-muted-foreground leading-relaxed">
 				Učitajte JSON datoteku izvezenu iz ove aplikacije kako biste obnovili podatke u novoj Supabase bazi.
-				Ako koristite datoteku u formatu <strong>schema+data</strong>, tablice će se automatski stvoriti prije uvoza — nije potrebno ručno postavljati bazu.
-				Ova stranica je dostupna bez prijave kako biste mogli uvesti podatke odmah nakon spajanja na novu bazu.
+				Datoteka formata <strong>schema+data</strong> automatski kreira sve tablice prije uvoza — nije potrebno ručno postavljati bazu.
 			</p>
 		</div>
 
@@ -80,7 +137,7 @@
 		<div class="mb-6 flex items-start gap-3 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800 dark:border-amber-800/40 dark:bg-amber-900/20 dark:text-amber-200">
 			<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mt-0.5 shrink-0"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>
 			<p>
-				<strong>Napomena:</strong> Ova stranica je javno dostupna. Nakon što završite s uvozom podataka, preporučamo
+				<strong>Napomena:</strong> Ova stranica je javno dostupna. Nakon što završite s uvozom, preporučamo
 				da <strong>uklonite ili zaštitite</strong> ovu rutu u produkcijskom okruženju.
 			</p>
 		</div>
@@ -149,6 +206,9 @@
 			}}
 			class="grid gap-6"
 		>
+			<!-- Hidden field: selected sections (comma-separated) -->
+			<input type="hidden" name="sections" value={[...selectedSections].join(',')} />
+
 			<!-- File drop zone -->
 			<!-- svelte-ignore a11y_no_static_element_interactions -->
 			<div
@@ -186,6 +246,49 @@
 				</label>
 			</div>
 
+			<!-- Section selector -->
+			<fieldset class="grid gap-3">
+				<div class="flex items-center justify-between">
+					<legend class="text-sm font-medium">Što uvesti</legend>
+					<button
+						type="button"
+						onclick={toggleAllSections}
+						class="text-xs text-primary hover:underline"
+					>
+						{allSectionsChecked ? 'Odznači sve' : 'Označi sve'}
+					</button>
+				</div>
+				<div class="flex flex-wrap gap-2">
+					{#each ALL_SECTIONS as section (section.id)}
+						{@const available = availableSections.has(section.id)}
+						{@const checked = selectedSections.has(section.id)}
+						<button
+							type="button"
+							disabled={!available}
+							onclick={() => toggleSection(section.id)}
+							class="inline-flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-xs font-medium transition-colors {!available
+								? 'border-border bg-background text-muted-foreground/40 cursor-not-allowed'
+								: checked
+								? 'border-primary bg-primary/10 text-primary'
+								: 'border-border bg-background text-muted-foreground hover:bg-muted'}"
+						>
+							<span class="flex h-3.5 w-3.5 items-center justify-center rounded-sm border {checked && available ? 'border-primary bg-primary' : 'border-muted-foreground/50'}">
+								{#if checked && available}
+									<svg xmlns="http://www.w3.org/2000/svg" width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+								{/if}
+							</span>
+							{section.label}
+							{#if !available}
+								<span class="text-muted-foreground/40">(nije u datoteci)</span>
+							{/if}
+						</button>
+					{/each}
+				</div>
+				{#if !fileName}
+					<p class="text-xs text-muted-foreground">Otvori datoteku da bi se automatski otkrilo koji podatci su dostupni.</p>
+				{/if}
+			</fieldset>
+
 			<!-- Mode selector -->
 			<fieldset class="grid gap-3">
 				<legend class="text-sm font-medium">Način uvoza</legend>
@@ -199,15 +302,15 @@
 				<label class="flex cursor-pointer items-start gap-3 rounded-xl border border-border bg-card p-4 transition-colors {mode === 'replace' ? 'border-destructive bg-destructive/5' : 'hover:bg-muted/50'}">
 					<input type="radio" name="mode" value="replace" bind:group={mode} class="mt-0.5 h-4 w-4 accent-destructive" />
 					<div>
-						<p class="font-medium text-sm text-destructive">Zamijeni sve podatke</p>
-						<p class="text-xs text-muted-foreground leading-relaxed">Briše SVE postojeće retke iz svih tablica, zatim umeće uvezene podatke. Nepovratan!</p>
+						<p class="font-medium text-sm text-destructive">Zamijeni odabrane podatke</p>
+						<p class="text-xs text-muted-foreground leading-relaxed">Briše SVE postojeće retke iz odabranih tablica, zatim umeće uvezene podatke. Nepovratan!</p>
 					</div>
 				</label>
 			</fieldset>
 
 			<button
 				type="submit"
-				disabled={submitting || !fileName}
+				disabled={submitting || !fileName || noneSectionsChecked}
 				class="inline-flex items-center justify-center gap-2 rounded-lg bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
 			>
 				{#if submitting}
@@ -228,6 +331,8 @@
 				<pre class="overflow-x-auto rounded-lg bg-muted p-4 text-xs leading-relaxed">{`{
   "exported_at": "2024-01-01T00:00:00.000Z",
   "format": "data-only" | "schema+data",
+  "db_version": "2",
+  "sections": ["nominees", "votes", ...],
   // "schema+data" → automatski kreira tablice prije uvoza
   "tables": {
     "nominees": [...],
@@ -235,10 +340,8 @@
     "stories": [...],
     "site_content": [...]
   },
-  "auth": {
-    "users": [...]
-  },
-  "schema_ddl": "..."   // prisutno samo u "schema+data" formatu
+  "auth": { "users": [...] },
+  "schema_ddl": "..."   // samo u "schema+data" formatu
 }`}</pre>
 			</div>
 		</details>
