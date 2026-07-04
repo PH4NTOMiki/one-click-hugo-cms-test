@@ -1,9 +1,11 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
-	import { t } from '$lib/content';
+	import { makeT } from '$lib/content';
 	import type { PageData, ActionData } from './$types';
 
 	let { data, form }: { data: PageData; form: ActionData } = $props();
+
+	const t = $derived(makeT(data.content));
 
 	const done = $derived(form?.success || data.hasVoted);
 </script>

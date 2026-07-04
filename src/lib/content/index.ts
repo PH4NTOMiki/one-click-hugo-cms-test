@@ -1,16 +1,22 @@
-// Runtime access to site text. Values come from `generated.json`, which is
-// (re)written at build time from the Supabase `site_content` table by the Vite
-// plugin in vite.config.ts. This means text only refreshes on a new deploy or
-// redeploy — never on a per-request database read.
+// Runtime access to site text.
+// Values are fetched from the Supabase `site_content` table on every request
+// via the root layout server load and passed down through SvelteKit's data
+// system. This means string changes in the admin panel take effect immediately
+// on the next page load — no redeploy needed.
 
-import generated from './generated.json';
 import { defaultContent } from './defaults';
 
-const merged: Record<string, string> = { ...defaultContent, ...(generated as Record<string, string>) };
+export type ContentRecord = Record<string, string>;
 
-/** Get an editable string by key, falling back to the built-in default. */
-export function t(key: string): string {
-	return merged[key] ?? defaultContent[key] ?? '';
+/**
+ * Create a `t()` lookup bound to a live content record from the server load.
+ * Falls back to built-in defaults for any key not found in the record.
+ *
+ * Usage in a .svelte file:
+ *   const t = makeT(data.content);
+ */
+export function makeT(record: ContentRecord) {
+	return function t(key: string): string {
+		return record[key] ?? defaultContent[key] ?? '';
+	};
 }
-
-export const content = merged;

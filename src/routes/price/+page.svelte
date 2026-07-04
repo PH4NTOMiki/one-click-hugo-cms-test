@@ -1,9 +1,11 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
-	import { t } from '$lib/content';
-	import type { ActionData } from './$types';
+	import { makeT } from '$lib/content';
+	import type { PageData, ActionData } from './$types';
 
-	let { form }: { form: ActionData } = $props();
+	let { data, form }: { data: PageData; form: ActionData } = $props();
+
+	const t = $derived(makeT(data.content));
 
 	let message = $state(form?.values?.message ?? '');
 	const MAX = 1000;

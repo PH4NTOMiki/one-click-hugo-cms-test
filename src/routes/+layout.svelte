@@ -2,9 +2,12 @@
 	import '../app.css';
 	import { page } from '$app/stores';
 	import Sponsors from '$lib/components/Sponsors.svelte';
-	import { t } from '$lib/content';
+	import { makeT } from '$lib/content';
+	import type { LayoutData } from './$types';
 
-	let { children } = $props();
+	let { children, data }: { children: any; data: LayoutData } = $props();
+
+	const t = $derived(makeT(data.content));
 
 	const isAdmin = $derived($page.url.pathname.startsWith('/admin'));
 	let menuOpen = $state(false);

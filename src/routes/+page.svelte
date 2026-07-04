@@ -1,8 +1,10 @@
 <script lang="ts">
 	import type { PageData } from "./$types";
-	import { t } from "$lib/content";
+	import { makeT } from "$lib/content";
 
 	let { data }: { data: PageData } = $props();
+
+	const t = $derived(makeT(data.content));
 
 	const hasWinners = $derived(!!data.voteWinner || !!data.storyWinner);
 </script>

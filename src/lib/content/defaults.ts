@@ -1,10 +1,10 @@
 // Single source of truth for all editable page text and button labels.
 //
 // Each field is stored in the Supabase `site_content` table (key -> value) and
-// baked into `generated.json` at build time. The metadata here (group, label,
-// multiline) drives the admin "Tekstovi" editor so a non-technical editor can
-// change any string. `default` is the fallback used when the database has no
-// row for a key (or the build cannot reach Supabase).
+// fetched on every request via the root layout server load. The metadata here
+// (group, label, multiline) drives the admin "Tekstovi" editor so a
+// non-technical editor can change any string without redeploying. `default` is
+// the fallback used when the database has no row for a key.
 
 export interface ContentField {
 	/** Stable key stored in the database. Never change once shipped. */
