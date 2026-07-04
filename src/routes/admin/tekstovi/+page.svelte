@@ -4,15 +4,17 @@
 
 	let { data, form }: { data: PageData; form: ActionData } = $props();
 
-	// Local copy of content so inputs never flash empty during the brief
-	// re-invalidation window that use:enhance triggers after a save.
+	// Local copy of content driven by the server values.
+	// Always sync fully from data.content whenever it changes so that
+	// after a save the fresh DB values are reflected in all fields.
 	let localContent: Record<string, string> = $state({ ...data.content });
 
-	// Sync from server whenever data.content changes (e.g. after page load or
-	// navigation), but don't overwrite what the user is currently typing.
 	$effect(() => {
-		for (const key of Object.keys(data.content)) {
-			if (!(key in localContent)) localContent[key] = data.content[key];
+		// data.content is the reactive dependency; spread it into localContent
+		// so inputs never show stale or empty values after use:enhance reloads.
+		const incoming = data.content;
+		for (const key of Object.keys(incoming)) {
+			localContent[key] = incoming[key];
 		}
 	});
 
