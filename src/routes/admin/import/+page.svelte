@@ -36,6 +36,7 @@
 	);
 
 	const tableLabels: Record<string, string> = {
+		schema: 'Shema baze',
 		nominees: 'Kandidati',
 		votes: 'Glasovi',
 		stories: 'Priče',
@@ -70,6 +71,7 @@
 			<h1 class="text-2xl font-semibold">Uvoz podataka</h1>
 			<p class="mt-1.5 text-sm text-muted-foreground leading-relaxed">
 				Učitajte JSON datoteku izvezenu iz ove aplikacije kako biste obnovili podatke u novoj Supabase bazi.
+				Ako koristite datoteku u formatu <strong>schema+data</strong>, tablice će se automatski stvoriti prije uvoza — nije potrebno ručno postavljati bazu.
 				Ova stranica je dostupna bez prijave kako biste mogli uvesti podatke odmah nakon spajanja na novu bazu.
 			</p>
 		</div>
@@ -225,7 +227,8 @@
 				<p class="text-xs text-muted-foreground mb-3">Podržani JSON format (izvoz iz uredništva):</p>
 				<pre class="overflow-x-auto rounded-lg bg-muted p-4 text-xs leading-relaxed">{`{
   "exported_at": "2024-01-01T00:00:00.000Z",
-  "format": "data-only",       // ili "schema+data"
+  "format": "data-only" | "schema+data",
+  // "schema+data" → automatski kreira tablice prije uvoza
   "tables": {
     "nominees": [...],
     "votes": [...],
@@ -235,7 +238,7 @@
   "auth": {
     "users": [...]
   },
-  "schema_ddl": "..."          // samo u "schema+data" formatu
+  "schema_ddl": "..."   // prisutno samo u "schema+data" formatu
 }`}</pre>
 			</div>
 		</details>

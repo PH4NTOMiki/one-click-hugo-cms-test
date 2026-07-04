@@ -90,23 +90,47 @@ CREATE INDEX IF NOT EXISTS stories_is_winner_idx  ON public.stories(is_winner);
 
 -- RLS: nominees
 ALTER TABLE public.nominees ENABLE ROW LEVEL SECURITY;
-CREATE POLICY IF NOT EXISTS "nominees_public_select" ON public.nominees FOR SELECT USING (true);
-CREATE POLICY IF NOT EXISTS "nominees_auth_all" ON public.nominees FOR ALL TO authenticated USING (true) WITH CHECK (true);
+DO $$ BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='nominees' AND policyname='nominees_public_select') THEN
+    CREATE POLICY "nominees_public_select" ON public.nominees FOR SELECT USING (true);
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='nominees' AND policyname='nominees_auth_all') THEN
+    CREATE POLICY "nominees_auth_all" ON public.nominees FOR ALL TO authenticated USING (true) WITH CHECK (true);
+  END IF;
+END $$;
 
 -- RLS: votes
 ALTER TABLE public.votes ENABLE ROW LEVEL SECURITY;
-CREATE POLICY IF NOT EXISTS "votes_public_insert" ON public.votes FOR INSERT WITH CHECK (true);
-CREATE POLICY IF NOT EXISTS "votes_auth_select" ON public.votes FOR SELECT TO authenticated USING (true);
+DO $$ BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='votes' AND policyname='votes_public_insert') THEN
+    CREATE POLICY "votes_public_insert" ON public.votes FOR INSERT WITH CHECK (true);
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='votes' AND policyname='votes_auth_select') THEN
+    CREATE POLICY "votes_auth_select" ON public.votes FOR SELECT TO authenticated USING (true);
+  END IF;
+END $$;
 
 -- RLS: stories
 ALTER TABLE public.stories ENABLE ROW LEVEL SECURITY;
-CREATE POLICY IF NOT EXISTS "stories_public_insert" ON public.stories FOR INSERT WITH CHECK (true);
-CREATE POLICY IF NOT EXISTS "stories_auth_all" ON public.stories FOR ALL TO authenticated USING (true) WITH CHECK (true);
+DO $$ BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='stories' AND policyname='stories_public_insert') THEN
+    CREATE POLICY "stories_public_insert" ON public.stories FOR INSERT WITH CHECK (true);
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='stories' AND policyname='stories_auth_all') THEN
+    CREATE POLICY "stories_auth_all" ON public.stories FOR ALL TO authenticated USING (true) WITH CHECK (true);
+  END IF;
+END $$;
 
 -- RLS: site_content
 ALTER TABLE public.site_content ENABLE ROW LEVEL SECURITY;
-CREATE POLICY IF NOT EXISTS "site_content_public_select" ON public.site_content FOR SELECT USING (true);
-CREATE POLICY IF NOT EXISTS "site_content_auth_all" ON public.site_content FOR ALL TO authenticated USING (true) WITH CHECK (true);
+DO $$ BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='site_content' AND policyname='site_content_public_select') THEN
+    CREATE POLICY "site_content_public_select" ON public.site_content FOR SELECT USING (true);
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='site_content' AND policyname='site_content_auth_all') THEN
+    CREATE POLICY "site_content_auth_all" ON public.site_content FOR ALL TO authenticated USING (true) WITH CHECK (true);
+  END IF;
+END $$;
 `;
 
 // ---------------------------------------------------------------------------

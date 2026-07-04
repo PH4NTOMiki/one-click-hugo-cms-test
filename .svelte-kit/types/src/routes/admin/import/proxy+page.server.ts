@@ -2,6 +2,8 @@
 import { fail } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
 import { supabaseAdmin } from '$lib/server/supabaseAdmin';
+import { SUPABASE_SERVICE_ROLE_KEY } from '$env/static/private';
+import { PUBLIC_SUPABASE_URL } from '$lib/config';
 
 // This page is intentionally PUBLIC — no auth guard — so you can restore data
 // immediately after connecting a fresh Supabase project, before any admin user
@@ -17,6 +19,7 @@ export const load = async () => {
 
 interface ImportBundle {
 	format?: string;
+	schema_ddl?: string;
 	tables?: {
 		nominees?: Record<string, unknown>[];
 		votes?: Record<string, unknown>[];
@@ -35,6 +38,35 @@ interface ImportBundle {
 
 function isBundle(v: unknown): v is ImportBundle {
 	return typeof v === 'object' && v !== null && 'tables' in v;
+}
+
+/**
+ * Execute raw SQL against Supabase using the Management API (REST).
+ * This is needed to run DDL (CREATE TABLE, etc.) which the JS client cannot do.
+ */
+async function runDDL(sql: string): Promise<{ error: string | null }> {
+	// Extract project ref from the Supabase URL: https://<ref>.supabase.co
+	const match = PUBLIC_SUPABASE_URL.match(/https:\/\/([^.]+)\.supabase\.co/);
+	if (!match) return { error: 'Nije moguće odrediti Supabase projekt iz URL-a.' };
+	const projectRef = match[1];
+
+	const res = await fetch(
+		`https://api.supabase.com/v1/projects/${projectRef}/database/query`,
+		{
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+				Authorization: `Bearer ${SUPABASE_SERVICE_ROLE_KEY}`
+			},
+			body: JSON.stringify({ query: sql })
+		}
+	);
+
+	if (!res.ok) {
+		const body = await res.text().catch(() => res.statusText);
+		return { error: body };
+	}
+	return { error: null };
 }
 
 // ---------------------------------------------------------------------------
@@ -64,6 +96,17 @@ export const actions = {
 		const tables = bundle.tables ?? {};
 		const summary: Record<string, number> = {};
 		const errors: string[] = [];
+
+		// ------------------------------------------------------------------
+		// Schema mode: run the DDL first so all tables exist before upsert
+		// ------------------------------------------------------------------
+		if (bundle.format === 'schema+data' && bundle.schema_ddl) {
+			const { error: ddlErr } = await runDDL(bundle.schema_ddl);
+			if (ddlErr) {
+				return fail(500, { error: `Greška pri postavljanju sheme:\n${ddlErr}` });
+			}
+			summary.schema = 1;
+		}
 
 		// ------------------------------------------------------------------
 		// Replace mode: delete existing rows first (order matters for FKs)
