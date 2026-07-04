@@ -1,8 +1,6 @@
 import { fail } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
 import { supabaseAdmin } from '$lib/server/supabaseAdmin';
-import { SUPABASE_SERVICE_ROLE_KEY } from '$env/static/private';
-import { PUBLIC_SUPABASE_URL } from '$lib/config';
 
 // This page is intentionally PUBLIC — no auth guard — so you can restore data
 // immediately after connecting a fresh Supabase project, before any admin user
@@ -40,32 +38,13 @@ function isBundle(v: unknown): v is ImportBundle {
 }
 
 /**
- * Execute raw SQL against Supabase using the Management API (REST).
- * This is needed to run DDL (CREATE TABLE, etc.) which the JS client cannot do.
+ * Execute raw DDL via the exec_ddl(sql) Postgres function.
+ * The function is SECURITY DEFINER so it runs with superuser privileges,
+ * and is only callable by the service_role key that supabaseAdmin uses.
  */
 async function runDDL(sql: string): Promise<{ error: string | null }> {
-	// Extract project ref from the Supabase URL: https://<ref>.supabase.co
-	const match = PUBLIC_SUPABASE_URL.match(/https:\/\/([^.]+)\.supabase\.co/);
-	if (!match) return { error: 'Nije moguće odrediti Supabase projekt iz URL-a.' };
-	const projectRef = match[1];
-
-	const res = await fetch(
-		`https://api.supabase.com/v1/projects/${projectRef}/database/query`,
-		{
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json',
-				Authorization: `Bearer ${SUPABASE_SERVICE_ROLE_KEY}`
-			},
-			body: JSON.stringify({ query: sql })
-		}
-	);
-
-	if (!res.ok) {
-		const body = await res.text().catch(() => res.statusText);
-		return { error: body };
-	}
-	return { error: null };
+	const { error } = await supabaseAdmin.rpc('exec_ddl', { sql });
+	return { error: error ? error.message : null };
 }
 
 // ---------------------------------------------------------------------------
