@@ -2,6 +2,7 @@ import { fail, redirect } from '@sveltejs/kit';
 import { env } from '$env/dynamic/private';
 import type { Actions, PageServerLoad } from './$types';
 import { contentFields, defaultContent } from '$lib/content/defaults';
+import { supabaseAdmin } from '$lib/server/supabaseAdmin';
 
 export const load: PageServerLoad = async ({ locals }) => {
 	const { data: contentRows } = await locals.supabase.from('site_content').select('key, value');
@@ -26,7 +27,7 @@ export const actions: Actions = {
 			value: String(f.get(field.key) ?? field.default),
 			updated_at: new Date().toISOString()
 		}));
-		const { error } = await locals.supabase.from('site_content').upsert(rows, { onConflict: 'key' });
+		const { error } = await supabaseAdmin.from('site_content').upsert(rows, { onConflict: 'key' });
 		if (error) return fail(500, { error: 'Spremanje tekstova nije uspjelo.' });
 		return { success: true, savedContent: true };
 	},
