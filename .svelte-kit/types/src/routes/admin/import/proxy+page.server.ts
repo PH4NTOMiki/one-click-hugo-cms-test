@@ -2,6 +2,8 @@
 import { fail } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
 import { supabaseAdmin } from '$lib/server/supabaseAdmin';
+import { POSTGRES_URL_NON_POOLING } from '$env/static/private';
+import pg from 'pg';
 
 // This page is intentionally PUBLIC — no auth guard — so you can restore data
 // immediately after connecting a fresh Supabase project, before any admin user
@@ -39,13 +41,21 @@ function isBundle(v: unknown): v is ImportBundle {
 }
 
 /**
- * Execute raw DDL via the exec_ddl(sql) Postgres function.
- * The function is SECURITY DEFINER so it runs with superuser privileges,
- * and is only callable by the service_role key that supabaseAdmin uses.
+ * Execute raw DDL by opening a direct Postgres connection.
+ * Uses POSTGRES_URL_NON_POOLING so it works on a completely blank database
+ * with no pre-existing functions or tables required.
  */
 async function runDDL(sql: string): Promise<{ error: string | null }> {
-	const { error } = await supabaseAdmin.rpc('exec_ddl', { sql });
-	return { error: error ? error.message : null };
+	const client = new pg.Client({ connectionString: POSTGRES_URL_NON_POOLING, ssl: { rejectUnauthorized: false } });
+	try {
+		await client.connect();
+		await client.query(sql);
+		return { error: null };
+	} catch (e) {
+		return { error: e instanceof Error ? e.message : String(e) };
+	} finally {
+		await client.end();
+	}
 }
 
 // ---------------------------------------------------------------------------
