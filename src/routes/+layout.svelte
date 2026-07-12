@@ -21,7 +21,7 @@
 					<img src="/najsestra-mark.jpeg" alt="" class="h-14 w-14 md:h-16 md:w-16 object-contain" width="64" height="64" />
 					<span class="leading-none">
 						<span class="block text-2xl md:text-3xl font-extrabold tracking-tight text-foreground" style="font-family: var(--font-display)">NajSESTRA</span>
-						<span class="block text-base md:text-lg font-semibold tracking-wide text-primary mt-1">u dijabetesu</span>
+						<span class="block text-base md:text-lg font-semibold tracking-wide text-primary mt-0">u dijabetesu</span>
 					</span>
 				</a>
 
