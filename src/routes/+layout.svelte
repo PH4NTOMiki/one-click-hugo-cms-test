@@ -16,18 +16,18 @@
 <div class="flex min-h-screen flex-col">
 	{#if !isAdmin}
 		<header class="sticky top-0 z-20 border-b border-border bg-card/95 backdrop-blur">
-			<div class="mx-auto flex max-w-5xl items-center justify-between px-4 py-4 md:py-5">
-				<a href="/" class="flex items-center gap-3.5" onclick={() => (menuOpen = false)}>
-					<img src="/najsestra-mark.jpeg" alt="" class="h-16 w-16 md:h-20 md:w-20 object-contain" width="80" height="80" />
+			<div class="mx-auto flex max-w-5xl items-center justify-between px-4 py-3 md:py-4">
+				<a href="/" class="flex items-center gap-3" onclick={() => (menuOpen = false)}>
+					<img src="/najsestra-mark.jpeg" alt="" class="h-14 w-14 md:h-16 md:w-16 object-contain" width="64" height="64" />
 					<span class="leading-none">
-						<span class="block text-3xl md:text-4xl font-extrabold tracking-tight text-foreground" style="font-family: var(--font-display)">NajSESTRA</span>
-						<span class="block text-lg md:text-xl font-semibold tracking-wide text-primary mt-1.5">u dijabetesu</span>
+						<span class="block text-2xl md:text-3xl font-extrabold tracking-tight text-foreground" style="font-family: var(--font-display)">NajSESTRA</span>
+						<span class="block text-base md:text-lg font-semibold tracking-wide text-primary mt-1">u dijabetesu</span>
 					</span>
 				</a>
 
-				<nav class="hidden items-center gap-2 sm:flex">
-					<a href="/glasanje" class="rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground">{t('nav_vote')}</a>
-					<a href="/price" class="rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground">{t('nav_story')}</a>
+				<nav class="hidden items-center gap-3 sm:flex">
+					<a href="/glasanje" class="rounded-lg border border-border px-4 py-2.5 text-sm font-semibold text-foreground transition-colors hover:bg-muted">{t('nav_vote')}</a>
+					<a href="/price" class="rounded-lg border border-border px-4 py-2.5 text-sm font-semibold text-foreground transition-colors hover:bg-muted">{t('nav_story')}</a>
 				</nav>
 
 				<button
