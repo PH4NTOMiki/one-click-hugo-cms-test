@@ -17,9 +17,9 @@
 	{#if !isAdmin}
 		<header class="sticky top-0 z-20 border-b border-border bg-card/95 backdrop-blur">
 			<div class="mx-auto flex max-w-5xl items-center justify-between px-4 py-3 md:py-4">
-				<a href="/" class="flex items-center gap-3" onclick={() => (menuOpen = false)}>
+				<a href="/" class="flex shrink-0 items-center gap-3" onclick={() => (menuOpen = false)}>
 					<img src="/najsestra-mark.jpeg" alt="" class="h-14 w-14 md:h-16 md:w-16 object-contain" width="64" height="64" />
-					<span class="flex flex-col md:flex-row md:items-baseline md:gap-2 leading-none">
+					<span class="flex flex-col whitespace-nowrap md:flex-row md:items-baseline md:gap-2 leading-none">
 						<span class="text-2xl md:text-3xl font-extrabold tracking-tight text-foreground" style="font-family: var(--font-display)">NajSESTRA</span>
 						<span class="text-lg md:text-2xl font-bold tracking-wide text-primary">u dijabetesu</span>
 					</span>
