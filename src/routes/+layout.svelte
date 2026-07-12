@@ -16,12 +16,12 @@
 <div class="flex min-h-screen flex-col">
 	{#if !isAdmin}
 		<header class="sticky top-0 z-20 border-b border-border bg-card/95 backdrop-blur">
-			<div class="mx-auto flex max-w-5xl items-center justify-between px-4 py-3">
-				<a href="/" class="flex items-center gap-2.5" onclick={() => (menuOpen = false)}>
-					<img src="/najsestra-mark.jpeg" alt="" class="h-11 w-11 md:h-12 md:w-12 object-contain" width="48" height="48" />
+			<div class="mx-auto flex max-w-5xl items-center justify-between px-4 py-3 md:py-4">
+				<a href="/" class="flex items-center gap-3" onclick={() => (menuOpen = false)}>
+					<img src="/najsestra-mark.jpeg" alt="" class="h-14 w-14 md:h-16 md:w-16 object-contain" width="64" height="64" />
 					<span class="leading-none">
-						<span class="block text-xl font-extrabold tracking-tight text-foreground" style="font-family: var(--font-display)">NajSESTRA</span>
-						<span class="block text-sm font-semibold tracking-wide text-primary mt-0.5">u dijabetesu</span>
+						<span class="block text-2xl md:text-3xl font-extrabold tracking-tight text-foreground" style="font-family: var(--font-display)">NajSESTRA</span>
+						<span class="block text-base md:text-lg font-semibold tracking-wide text-primary mt-1">u dijabetesu</span>
 					</span>
 				</a>
 
