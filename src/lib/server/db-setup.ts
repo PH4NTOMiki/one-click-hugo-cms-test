@@ -19,7 +19,7 @@ import { contentFields } from '$lib/content/defaults';
 // ---------------------------------------------------------------------------
 // Bump this whenever the schema or default content changes.
 // ---------------------------------------------------------------------------
-export const DB_VERSION = '2';
+export const DB_VERSION = '3';
 
 // ---------------------------------------------------------------------------
 // Full schema DDL — also exported so the export endpoint can embed it.
