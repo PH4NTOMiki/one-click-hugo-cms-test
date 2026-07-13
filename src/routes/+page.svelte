@@ -33,11 +33,37 @@
 				{t('home_hero_title')}
 				<span class="text-accent">♥</span>
 			</h1>
-			<p
-				class="mt-3 max-w-md leading-relaxed text-muted-foreground text-pretty md:mt-5 md:text-lg"
-			>
-				{t('home_hero_subtitle')}
-			</p>
+			<div class="flex flex-wrap items-center gap-2">
+				<p
+					class="mt-3 max-w-md leading-relaxed text-muted-foreground text-pretty md:mt-5 md:text-lg"
+				>
+					{t('home_hero_subtitle')}
+				</p>
+
+				{#if !heroExpanded}
+					<button
+						type="button"
+						onclick={() => (heroExpanded = !heroExpanded)}
+						aria-expanded={heroExpanded}
+						class="mt-3 inline-flex items-center gap-1.5 text-sm font-semibold text-primary transition-colors hover:text-primary/80"
+					>
+						{t('home_hero_more_button')}
+						<svg
+							xmlns="http://www.w3.org/2000/svg"
+							width="16"
+							height="16"
+							viewBox="0 0 24 24"
+							fill="none"
+							stroke="currentColor"
+							stroke-width="2"
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							class="shrink-0 transition-transform duration-200"
+							><path d="m6 9 6 6 6-6" /></svg
+						>
+					</button>
+				{/if}
+			</div>
 
 			{#if heroExpanded}
 				<p
@@ -47,28 +73,6 @@
 					{t('home_hero_more_text')}
 				</p>
 			{/if}
-
-			<button
-				type="button"
-				onclick={() => (heroExpanded = !heroExpanded)}
-				aria-expanded={heroExpanded}
-				class="mt-3 inline-flex items-center gap-1.5 text-sm font-semibold text-primary transition-colors hover:text-primary/80"
-			>
-				{t('home_hero_more_button')}
-				<svg
-					xmlns="http://www.w3.org/2000/svg"
-					width="16"
-					height="16"
-					viewBox="0 0 24 24"
-					fill="none"
-					stroke="currentColor"
-					stroke-width="2"
-					stroke-linecap="round"
-					stroke-linejoin="round"
-					class="shrink-0 transition-transform duration-200 {heroExpanded ? 'rotate-180' : ''}"
-					><path d="m6 9 6 6 6-6" /></svg
-				>
-			</button>
 		</div>
 		<div class="order-1 overflow-hidden rounded-2xl md:order-2 md:rounded-3xl">
 			<img
