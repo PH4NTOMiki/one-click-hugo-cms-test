@@ -16,17 +16,27 @@ export const nodes = [
 	() => import('./nodes/4'),
 	() => import('./nodes/5'),
 	() => import('./nodes/6'),
-	() => import('./nodes/7')
+	() => import('./nodes/7'),
+	() => import('./nodes/8'),
+	() => import('./nodes/9'),
+	() => import('./nodes/10'),
+	() => import('./nodes/11'),
+	() => import('./nodes/12')
 ];
 
 export const server_loads = [0,2];
 
 export const dictionary = {
-		"/": [3],
+		"/": [~3],
 		"/admin": [~4,[2]],
-		"/admin/login": [~5,[2]],
-		"/glasanje": [~6],
-		"/price": [~7]
+		"/admin/data": [~5,[2]],
+		"/admin/glasanje": [~6,[2]],
+		"/admin/import": [~7,[2]],
+		"/admin/login": [~8,[2]],
+		"/admin/price": [~9,[2]],
+		"/admin/tekstovi": [~10,[2]],
+		"/glasanje": [~11],
+		"/price": [~12]
 	};
 
 export const hooks = {

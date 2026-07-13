@@ -1,5 +1,6 @@
 {
 	"/": [
+		"src/routes/+page.server.ts",
 		"src/routes/+layout.server.ts",
 		"src/routes/+layout.server.ts"
 	],
@@ -10,8 +11,36 @@
 		"src/routes/admin/+layout.server.ts",
 		"src/routes/+layout.server.ts"
 	],
+	"/admin/data": [
+		"src/routes/admin/data/+page.server.ts",
+		"src/routes/admin/+layout.server.ts",
+		"src/routes/+layout.server.ts"
+	],
+	"/admin/export": [
+		"src/routes/admin/export/+server.ts"
+	],
+	"/admin/glasanje": [
+		"src/routes/admin/glasanje/+page.server.ts",
+		"src/routes/admin/+layout.server.ts",
+		"src/routes/+layout.server.ts"
+	],
+	"/admin/import": [
+		"src/routes/admin/import/+page.server.ts",
+		"src/routes/admin/+layout.server.ts",
+		"src/routes/+layout.server.ts"
+	],
 	"/admin/login": [
 		"src/routes/admin/login/+page.server.ts",
+		"src/routes/admin/+layout.server.ts",
+		"src/routes/+layout.server.ts"
+	],
+	"/admin/price": [
+		"src/routes/admin/price/+page.server.ts",
+		"src/routes/admin/+layout.server.ts",
+		"src/routes/+layout.server.ts"
+	],
+	"/admin/tekstovi": [
+		"src/routes/admin/tekstovi/+page.server.ts",
 		"src/routes/admin/+layout.server.ts",
 		"src/routes/+layout.server.ts"
 	],

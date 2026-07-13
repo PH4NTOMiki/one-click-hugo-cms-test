@@ -4,6 +4,10 @@ import {
 	PUBLIC_SUPABASE_URL,
 	PUBLIC_SUPABASE_ANON_KEY
 } from '$lib/config';
+import { ensureDb } from '$lib/server/db-setup';
+
+// Run once at server startup — creates/migrates the DB schema if needed.
+ensureDb();
 
 export const handle: Handle = async ({ event, resolve }) => {
 	event.locals.supabase = createServerClient(PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY, {
