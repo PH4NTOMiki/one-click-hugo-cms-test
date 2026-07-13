@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { PageData } from "./$types";
 	import { makeT } from "$lib/content";
-	import { slide } from "svelte/transition";
+	import { slide, fade } from "svelte/transition";
 	import { quintOut } from "svelte/easing";
 
 	let { data }: { data: PageData } = $props();
@@ -33,46 +33,44 @@
 				{t('home_hero_title')}
 				<span class="text-accent">♥</span>
 			</h1>
-			<div class="flex flex-wrap items-baseline gap-2">
-				<p
-					class="mt-3 leading-relaxed text-muted-foreground text-pretty md:mt-5 md:text-lg"
-				>
-					{t('home_hero_subtitle')}
-				</p>
-
-				{#if !heroExpanded}
-					<button
-						type="button"
-						onclick={() => (heroExpanded = !heroExpanded)}
-						aria-expanded={heroExpanded}
-						class="mt-3 inline-flex items-center gap-1.5 text-sm font-semibold text-primary transition-colors hover:text-primary/80"
-					>
-						{t('home_hero_more_button')}
-						<svg
-							xmlns="http://www.w3.org/2000/svg"
-							width="16"
-							height="16"
-							viewBox="0 0 24 24"
-							fill="none"
-							stroke="currentColor"
-							stroke-width="2"
-							stroke-linecap="round"
-							stroke-linejoin="round"
-							class="shrink-0 transition-transform duration-200"
-							><path d="m6 9 6 6 6-6" /></svg
+			<div class="mt-3 md:mt-5">
+				<div class="flex flex-wrap items-baseline gap-1 leading-relaxed text-muted-foreground text-pretty md:text-lg">
+					<span>
+						{t('home_hero_subtitle')}
+						{#if heroExpanded}
+							<span 
+								transition:fade={{ duration: 450 }}
+								class="inline"
+							>
+								{' '}{t('home_hero_more_text')}
+							</span>
+						{/if}
+					</span>
+					{#if !heroExpanded}
+						<button
+							type="button"
+							onclick={() => (heroExpanded = !heroExpanded)}
+							aria-expanded={heroExpanded}
+							class="inline-flex items-center gap-1.5 text-sm font-semibold text-primary transition-colors hover:text-primary/80 flex-shrink-0"
 						>
-					</button>
-				{/if}
+							{t('home_hero_more_button')}
+							<svg
+								xmlns="http://www.w3.org/2000/svg"
+								width="16"
+								height="16"
+								viewBox="0 0 24 24"
+								fill="none"
+								stroke="currentColor"
+								stroke-width="2"
+								stroke-linecap="round"
+								stroke-linejoin="round"
+								class="shrink-0 transition-transform duration-200"
+								><path d="m6 9 6 6 6-6" /></svg
+							>
+						</button>
+					{/if}
+				</div>
 			</div>
-
-			{#if heroExpanded}
-				<p
-					transition:slide={{ duration: 450, easing: quintOut }}
-					class="mt-3 max-w-md overflow-hidden leading-relaxed text-muted-foreground text-pretty md:text-lg"
-				>
-					{t('home_hero_more_text')}
-				</p>
-			{/if}
 		</div>
 		<div class="order-1 overflow-hidden rounded-2xl md:order-2 md:rounded-3xl">
 			<img
