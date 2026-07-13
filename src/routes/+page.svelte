@@ -33,9 +33,9 @@
 				{t('home_hero_title')}
 				<span class="text-accent">♥</span>
 			</h1>
-			<div class="flex flex-wrap items-center gap-2">
+			<div class="flex flex-wrap items-baseline gap-2">
 				<p
-					class="mt-3 max-w-md leading-relaxed text-muted-foreground text-pretty md:mt-5 md:text-lg"
+					class="mt-3 leading-relaxed text-muted-foreground text-pretty md:mt-5 md:text-lg"
 				>
 					{t('home_hero_subtitle')}
 				</p>
