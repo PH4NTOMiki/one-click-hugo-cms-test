@@ -1,6 +1,8 @@
 <script lang="ts">
 	import type { PageData } from "./$types";
 	import { makeT } from "$lib/content";
+	import { slide } from "svelte/transition";
+	import { quintOut } from "svelte/easing";
 
 	let { data }: { data: PageData } = $props();
 
@@ -39,7 +41,8 @@
 
 			{#if heroExpanded}
 				<p
-					class="mt-3 max-w-md leading-relaxed text-muted-foreground text-pretty md:text-lg"
+					transition:slide={{ duration: 450, easing: quintOut }}
+					class="mt-3 max-w-md overflow-hidden leading-relaxed text-muted-foreground text-pretty md:text-lg"
 				>
 					{t('home_hero_more_text')}
 				</p>
