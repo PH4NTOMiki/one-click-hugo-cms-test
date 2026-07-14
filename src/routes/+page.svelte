@@ -33,25 +33,15 @@
 				{t('home_hero_title')}
 				<span class="text-accent">♥</span>
 			</h1>
-			<div class="mt-3 md:mt-5">
-				<div class="flex flex-wrap items-baseline gap-1 leading-relaxed text-muted-foreground text-pretty md:text-lg">
-					<span>
-						{t('home_hero_subtitle')}
-						{#if heroExpanded}
-							<span 
-								transition:fade={{ duration: 450 }}
-								class="inline"
-							>
-								{' '}{t('home_hero_more_text')}
-							</span>
-						{/if}
-					</span>
+			<div class="mt-3 md:mt-5 text-pretty text-muted-foreground md:text-lg">
+				<p class="relative m-0 leading-relaxed">
+					{t('home_hero_subtitle')}
 					{#if !heroExpanded}
 						<button
 							type="button"
 							onclick={() => (heroExpanded = !heroExpanded)}
 							aria-expanded={heroExpanded}
-							class="inline-flex items-center gap-1.5 text-sm font-semibold text-primary transition-colors hover:text-primary/80 flex-shrink-0"
+							class="float-right ml-4 mt-1 inline-flex items-center gap-1.5 whitespace-nowrap rounded-full bg-surface px-3 py-2 text-sm font-semibold text-primary transition-colors hover:text-primary/80"
 						>
 							{t('home_hero_more_button')}
 							<svg
@@ -65,11 +55,17 @@
 								stroke-linecap="round"
 								stroke-linejoin="round"
 								class="shrink-0 transition-transform duration-200"
-								><path d="m6 9 6 6 6-6" /></svg
 							>
+								<path d="m6 9 6 6 6-6" />
+							</svg>
 						</button>
 					{/if}
-				</div>
+					{#if heroExpanded}
+						<span transition:fade={{ duration: 450 }} class="inline">
+							{' '}{t('home_hero_more_text')}
+						</span>
+					{/if}
+				</p>
 			</div>
 		</div>
 		<div class="order-1 overflow-hidden rounded-2xl md:order-2 md:rounded-3xl">
