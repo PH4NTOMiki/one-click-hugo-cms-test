@@ -36,29 +36,45 @@ export function reveal(node: HTMLElement, options: RevealOptions = {}) {
 		return {};
 	}
 
-	node.style.opacity = '0';
-	node.style.transform = y ? `translateY(${y}px)` : 'none';
-	node.style.transition = `opacity ${duration}ms ease-out ${delay}ms, transform ${duration}ms ease-out ${delay}ms`;
-	node.style.willChange = 'opacity, transform';
+	let observer: IntersectionObserver | null = null;
+	let raf1 = 0;
+	let raf2 = 0;
 
-	let observer: IntersectionObserver | null = new IntersectionObserver(
-		(entries) => {
-			for (const entry of entries) {
-				if (entry.isIntersecting) {
-					show();
-					observer?.unobserve(node);
-					observer?.disconnect();
-					observer = null;
-				}
-			}
-		},
-		{ threshold, rootMargin: '0px 0px -10% 0px' }
-	);
+	// Elements already in the viewport on page load (the hero) would otherwise
+	// have their IntersectionObserver fire before the "hidden" style below ever
+	// gets painted, so the browser skips straight to the visible state with no
+	// visible transition. Waiting two frames guarantees the hidden state is
+	// actually rendered at least once before we start watching for intersection.
+	raf1 = requestAnimationFrame(() => {
+		node.style.opacity = '0';
+		node.style.transform = y ? `translateY(${y}px)` : 'none';
 
-	observer.observe(node);
+		raf2 = requestAnimationFrame(() => {
+			node.style.transition = `opacity ${duration}ms ease-out ${delay}ms, transform ${duration}ms ease-out ${delay}ms`;
+			node.style.willChange = 'opacity, transform';
+
+			observer = new IntersectionObserver(
+				(entries) => {
+					for (const entry of entries) {
+						if (entry.isIntersecting) {
+							show();
+							observer?.unobserve(node);
+							observer?.disconnect();
+							observer = null;
+						}
+					}
+				},
+				{ threshold, rootMargin: '0px 0px -10% 0px' }
+			);
+
+			observer.observe(node);
+		});
+	});
 
 	return {
 		destroy() {
+			cancelAnimationFrame(raf1);
+			cancelAnimationFrame(raf2);
 			observer?.disconnect();
 			observer = null;
 		}
