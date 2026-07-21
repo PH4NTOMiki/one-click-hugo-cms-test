@@ -11,7 +11,18 @@
 
 	const isAdmin = $derived($page.url.pathname.startsWith('/admin'));
 	let menuOpen = $state(false);
+
+	const ogImage = $derived(`${$page.url.origin}/najsestra-mark.jpeg`);
 </script>
+
+<svelte:head>
+	<meta property="og:image" content={ogImage} />
+	<meta property="og:image:width" content="707" />
+	<meta property="og:image:height" content="870" />
+	<meta property="og:image:type" content="image/jpeg" />
+	<meta name="twitter:card" content="summary" />
+	<meta name="twitter:image" content={ogImage} />
+</svelte:head>
 
 <div class="flex min-h-screen flex-col">
 	{#if !isAdmin}
