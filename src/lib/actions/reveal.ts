@@ -20,7 +20,7 @@ export interface RevealOptions {
 }
 
 export function reveal(node: HTMLElement, options: RevealOptions = {}) {
-	let { y = 0, duration = 700, delay = 0, threshold = 0.15 } = options;
+	let { y = 0, duration = 1000, delay = 0, threshold = 0.15 } = options;
 
 	const prefersReducedMotion =
 		typeof window !== 'undefined' &&
