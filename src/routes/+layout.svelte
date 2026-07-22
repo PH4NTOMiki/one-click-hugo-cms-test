@@ -70,7 +70,7 @@
 	</main>
 
 	{#if !isAdmin}
-		<Sponsors />
+		<Sponsors sponsors={data.sponsors} content={data.content} />
 		<footer class="border-t border-border bg-card">
 			<div class="mx-auto flex max-w-5xl flex-col items-center justify-between gap-2 px-4 py-6 text-sm text-muted-foreground sm:flex-row">
 				<p>{t('footer_text')}</p>

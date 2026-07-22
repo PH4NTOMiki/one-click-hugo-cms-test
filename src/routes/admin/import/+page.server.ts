@@ -25,6 +25,7 @@ interface ImportBundle {
 		votes?: Record<string, unknown>[];
 		stories?: Record<string, unknown>[];
 		site_content?: Record<string, unknown>[];
+		sponsors?: Record<string, unknown>[];
 	};
 	auth?: {
 		users?: {
@@ -71,7 +72,7 @@ export const actions: Actions = {
 		const sectionsParam = formData.get('sections');
 		const selectedSections: Set<string> = sectionsParam
 			? new Set(String(sectionsParam).split(',').map((s) => s.trim()).filter(Boolean))
-			: new Set(['nominees', 'votes', 'stories', 'site_content', 'auth']);
+			: new Set(['nominees', 'votes', 'stories', 'site_content', 'sponsors', 'auth']);
 
 		if (!file || typeof file === 'string') {
 			return fail(400, { error: 'Nije odabrana datoteka.' });
@@ -117,6 +118,8 @@ export const actions: Actions = {
 				await supabaseAdmin.from('stories').delete().neq('id', '00000000-0000-0000-0000-000000000000');
 			if (selectedSections.has('site_content'))
 				await supabaseAdmin.from('site_content').delete().neq('key', '__never__');
+			if (selectedSections.has('sponsors'))
+				await supabaseAdmin.from('sponsors').delete().neq('id', '00000000-0000-0000-0000-000000000000');
 		}
 
 		// ------------------------------------------------------------------
@@ -161,6 +164,17 @@ export const actions: Actions = {
 				.upsert(tables.site_content as never[], { onConflict: 'key', count: 'exact' });
 			if (err) errors.push(`site_content: ${err.message}`);
 			else summary.site_content = count ?? tables.site_content.length;
+		}
+
+		// ------------------------------------------------------------------
+		// sponsors
+		// ------------------------------------------------------------------
+		if (selectedSections.has('sponsors') && tables.sponsors?.length) {
+			const { error: err, count } = await supabaseAdmin
+				.from('sponsors')
+				.upsert(tables.sponsors as never[], { onConflict: 'id', count: 'exact' });
+			if (err) errors.push(`sponsors: ${err.message}`);
+			else summary.sponsors = count ?? tables.sponsors.length;
 		}
 
 		// ------------------------------------------------------------------

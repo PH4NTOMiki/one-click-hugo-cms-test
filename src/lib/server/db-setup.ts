@@ -19,7 +19,7 @@ import { contentFields } from '$lib/content/defaults';
 // ---------------------------------------------------------------------------
 // Bump this whenever the schema or default content changes.
 // ---------------------------------------------------------------------------
-export const DB_VERSION = '3';
+export const DB_VERSION = '4';
 
 // ---------------------------------------------------------------------------
 // Full schema DDL — also exported so the export endpoint can embed it.
@@ -78,6 +78,17 @@ CREATE TABLE IF NOT EXISTS public.site_content (
   updated_at timestamptz NOT NULL DEFAULT now()
 );
 
+-- sponsors
+CREATE TABLE IF NOT EXISTS public.sponsors (
+  id          uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  name        text NOT NULL,
+  website_url text,
+  image_url   text,
+  is_active   boolean NOT NULL DEFAULT true,
+  sort_order  integer NOT NULL DEFAULT 0,
+  created_at  timestamptz NOT NULL DEFAULT now()
+);
+
 -- Indexes
 CREATE INDEX IF NOT EXISTS nominees_approved_idx ON public.nominees(approved);
 CREATE INDEX IF NOT EXISTS nominees_is_winner_idx ON public.nominees(is_winner);
@@ -85,6 +96,7 @@ CREATE INDEX IF NOT EXISTS votes_nominee_id_idx   ON public.votes(nominee_id);
 CREATE INDEX IF NOT EXISTS votes_voter_id_idx     ON public.votes(voter_id);
 CREATE INDEX IF NOT EXISTS stories_status_idx     ON public.stories(status);
 CREATE INDEX IF NOT EXISTS stories_is_winner_idx  ON public.stories(is_winner);
+CREATE INDEX IF NOT EXISTS sponsors_is_active_idx  ON public.sponsors(is_active);
 
 -- RLS: version_check (read-only for everyone, write only for service_role)
 ALTER TABLE public.version_check ENABLE ROW LEVEL SECURITY;
@@ -135,6 +147,17 @@ DO $$ BEGIN
   END IF;
   IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='site_content' AND policyname='site_content_auth_all') THEN
     CREATE POLICY "site_content_auth_all" ON public.site_content FOR ALL TO authenticated USING (true) WITH CHECK (true);
+  END IF;
+END $$;
+
+-- RLS: sponsors
+ALTER TABLE public.sponsors ENABLE ROW LEVEL SECURITY;
+DO $$ BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='sponsors' AND policyname='sponsors_public_select') THEN
+    CREATE POLICY "sponsors_public_select" ON public.sponsors FOR SELECT USING (true);
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='sponsors' AND policyname='sponsors_auth_all') THEN
+    CREATE POLICY "sponsors_auth_all" ON public.sponsors FOR ALL TO authenticated USING (true) WITH CHECK (true);
   END IF;
 END $$;
 `;

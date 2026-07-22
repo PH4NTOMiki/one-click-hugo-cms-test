@@ -8,6 +8,7 @@
 	const navLinks = [
 		{ href: '/admin/glasanje', label: 'Glasanje', countKey: 'nomineeCount' },
 		{ href: '/admin/price', label: 'Priče', countKey: 'storyCount' },
+		{ href: '/admin/sponzori', label: 'Sponzori', countKey: null },
 		{ href: '/admin/tekstovi', label: 'Tekstovi', countKey: null },
 		{ href: '/admin/data', label: 'Podaci', countKey: null }
 	] as const;

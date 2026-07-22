@@ -9,6 +9,7 @@
 		{ id: 'votes', label: 'Glasovi' },
 		{ id: 'stories', label: 'Priče' },
 		{ id: 'site_content', label: 'Tekstovi' },
+		{ id: 'sponsors', label: 'Sponzori' },
 		{ id: 'auth', label: 'Korisnici' }
 	] as const;
 
@@ -99,6 +100,7 @@
 		votes: 'Glasovi',
 		stories: 'Priče',
 		site_content: 'Tekstovi',
+		sponsors: 'Sponzori',
 		auth_users: 'Korisnici'
 	};
 </script>
@@ -338,7 +340,8 @@
     "nominees": [...],
     "votes": [...],
     "stories": [...],
-    "site_content": [...]
+    "site_content": [...],
+    "sponsors": [...]
   },
   "auth": { "users": [...] },
   "schema_ddl": "..."   // samo u "schema+data" formatu

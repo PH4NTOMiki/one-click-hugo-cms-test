@@ -29,7 +29,7 @@ function fmtDate(value: string | null): string {
 }
 
 // All valid JSON-exportable sections.
-const ALL_SECTIONS = ['nominees', 'votes', 'stories', 'site_content', 'auth'] as const;
+const ALL_SECTIONS = ['nominees', 'votes', 'stories', 'site_content', 'sponsors', 'auth'] as const;
 type Section = (typeof ALL_SECTIONS)[number];
 
 // ---------------------------------------------------------------------------
@@ -62,7 +62,7 @@ export const GET: RequestHandler = async ({ url, locals }) => {
 			: new Set(ALL_SECTIONS);
 
 		// Fetch only the requested tables in parallel.
-		const [nomineesRes, votesRes, storiesRes, contentRes, usersRes] = await Promise.all([
+		const [nomineesRes, votesRes, storiesRes, contentRes, sponsorsRes, usersRes] = await Promise.all([
 			selectedSections.has('nominees')
 				? supabaseAdmin.from('nominees').select('*').order('created_at', { ascending: true })
 				: Promise.resolve({ data: null }),
@@ -74,6 +74,9 @@ export const GET: RequestHandler = async ({ url, locals }) => {
 				: Promise.resolve({ data: null }),
 			selectedSections.has('site_content')
 				? supabaseAdmin.from('site_content').select('*')
+				: Promise.resolve({ data: null }),
+			selectedSections.has('sponsors')
+				? supabaseAdmin.from('sponsors').select('*').order('sort_order', { ascending: true })
 				: Promise.resolve({ data: null }),
 			selectedSections.has('auth')
 				? supabaseAdmin.auth.admin.listUsers({ perPage: 1000 })
@@ -97,6 +100,7 @@ export const GET: RequestHandler = async ({ url, locals }) => {
 		if (selectedSections.has('votes')) tables.votes = votesRes.data ?? [];
 		if (selectedSections.has('stories')) tables.stories = storiesRes.data ?? [];
 		if (selectedSections.has('site_content')) tables.site_content = contentRes.data ?? [];
+		if (selectedSections.has('sponsors')) tables.sponsors = sponsorsRes.data ?? [];
 
 		const bundle: Record<string, unknown> = {
 			exported_at: new Date().toISOString(),

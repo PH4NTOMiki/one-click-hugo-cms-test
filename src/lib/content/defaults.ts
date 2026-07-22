@@ -47,6 +47,11 @@ export const contentFields: ContentField[] = [
 	{ key: 'home_winners_vote_caption', group: 'Naslovnica — pobjednice', label: 'Opis pobjednice glasanja', multiline: true, default: 'Sestra s najviše glasova pacijenata i njihovih obitelji.' },
 	{ key: 'home_winners_story_label', group: 'Naslovnica — pobjednice', label: 'Oznaka: priča koja inspirira', default: 'Priča koja inspirira' },
 
+	// Sponzori
+	{ key: 'sponsors_heading', group: 'Sponzori', label: 'Naslov sekcije sponzora', default: 'Sponzori i partneri' },
+	{ key: 'sponsors_subheading', group: 'Sponzori', label: 'Podnaslov sekcije sponzora', default: 'Projekt podržavaju' },
+	{ key: 'sponsors_cta', group: 'Sponzori', label: 'Tekst poziva za sponzorstvo', multiline: true, default: 'Želite postati sponzor? Javite nam se i podržite priznanje medicinskim sestrama.' },
+
 	// Obrazac: Glasanje
 	{ key: 'vote_title', group: 'Obrazac: Glasanje', label: 'Naslov obrasca', default: 'Nominacija – Priznanje pacijenata' },
 	{ key: 'vote_subtitle', group: 'Obrazac: Glasanje', label: 'Podnaslov obrasca', multiline: true, default: 'Ispunite obrazac i predložite medicinsku sestru.' },
